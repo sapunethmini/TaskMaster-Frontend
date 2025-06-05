@@ -1,0 +1,104 @@
+<div class="task-list-container">
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <h3 class="filters-title">Filters</h3>
+    <div class="filters-row">
+      <div class="filter-item">
+        <label for="status-filter">Status</label>
+        <p-dropdown 
+          id="status-filter"
+          [options]="statusOptions" 
+          [(ngModel)]="selectedStatus"
+          (onChange)="onStatusChange()"
+          placeholder="Select Status"
+          [showClear]="true"
+          styleClass="filter-dropdown">
+        </p-dropdown>
+      </div>
+      
+      <div class="filter-item">
+        <label for="team-filter">Team</label>
+        <p-dropdown 
+          id="team-filter"
+          [options]="teamOptions" 
+          [(ngModel)]="selectedTeam"
+          (onChange)="onTeamChange()"
+          placeholder="Select Team"
+          [showClear]="true"
+          styleClass="filter-dropdown">
+        </p-dropdown>
+      </div>
+      
+      <div class="filter-item">
+        <label for="priority-filter">Priority</label>
+        <p-dropdown 
+          id="priority-filter"
+          [options]="priorityOptions" 
+          [(ngModel)]="selectedPriority"
+          (onChange)="onPriorityChange()"
+          placeholder="Select Priority"
+          [showClear]="true"
+          styleClass="filter-dropdown">
+        </p-dropdown>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-section">
+    <p-table 
+      [value]="filteredTasks" 
+      [paginator]="true" 
+      [rows]="10"
+      [responsive]="true"
+      styleClass="task-table">
+      
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Team</th>
+          <th>Priority</th>
+          <th>User ID</th>
+          <th>Duration</th>
+          <th>Created/Updated</th>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="body" let-task>
+        <tr>
+          <td>
+            <span class="task-title">{{ task.title }}</span>
+          </td>
+          <td>
+            <p-tag 
+              [value]="task.status" 
+              [ngClass]="'status-tag ' + getStatusSeverity(task.status)">
+            </p-tag>
+          </td>
+          <td>
+            <span class="team-badge">
+              {{ task.category }}
+            </span>
+          </td>
+          <td>
+            <span 
+              class="priority"
+              [ngClass]="getPrioritySeverity(task.priority)">
+              {{ task.priority }}
+            </span>
+          </td>
+          <td>
+            <span class="user-id">{{ task.user_id }}</span>
+          </td>
+          <td>
+            <span class="duration">{{ task.duration }}</span>
+          </td>
+          <td>
+            <span class="date-time">{{ task.updated_at | date:'medium' }}</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

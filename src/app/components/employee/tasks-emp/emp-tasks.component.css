@@ -1,0 +1,198 @@
+.tasks-container {
+  padding: 20px;
+}
+
+.tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Task Filters */
+.task-filters {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #dee2e6;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #495057;
+  font-weight: 600;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-buttons button {
+  margin: 0;
+}
+
+/* Table Styles */
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-header {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      padding: 12px;
+      border: none;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 12px;
+      border: none;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .p-datatable-tbody > tr:hover {
+      background: #f8f9fa;
+    }
+  }
+
+  .p-tag {
+    min-width: 80px;
+    text-align: center;
+  }
+
+  .p-dropdown {
+    width: 100%;
+  }
+
+  /* Filter button styles */
+  .p-button.p-button-outlined {
+    border-width: 1px;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .p-button.p-button-outlined:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Task Details Dialog */
+.task-details {
+  padding: 16px;
+}
+
+.detail-item {
+  margin-bottom: 16px;
+}
+
+.detail-item label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+}
+
+.detail-item p {
+  margin: 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.motivational-section {
+  margin: 1rem 0;
+}
+
+.motivational-card {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stars-container {
+  margin-bottom: 1rem;
+}
+
+.stars-container i {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin: 0 0.2rem;
+}
+
+.completion-rate {
+  margin-bottom: 1rem;
+}
+
+.rate-number {
+  font-size: 2rem;
+  font-weight: bold;
+  display: block;
+}
+
+.rate-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.motivational-message {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .tasks-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .tasks-header button {
+    width: 100%;
+  }
+
+  .filter-buttons {
+    flex-direction: column;
+  }
+
+  .filter-buttons button {
+    width: 100%;
+  }
+
+  .task-filters {
+    padding: 16px;
+  }
+}

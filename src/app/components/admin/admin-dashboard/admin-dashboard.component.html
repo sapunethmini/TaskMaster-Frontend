@@ -1,0 +1,33 @@
+<div class="dashboard-container">
+  <h1>Admin Dashboard</h1>
+
+  <div *ngIf="loading" class="loading">
+    Loading task statistics...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div class="stats-container" *ngIf="!loading && !error">
+    <div class="stat-card total">
+      <h2>Total Tasks</h2>
+      <p class="count">{{ totalTasks }}</p>
+    </div>
+
+    <div class="stat-card pending">
+      <h2>Pending Tasks</h2>
+      <p class="count">{{ pendingTasks }}</p>
+    </div>
+
+    <div class="stat-card in-progress">
+      <h2>In Progress Tasks</h2>
+      <p class="count">{{ inProgressTasks }}</p>
+    </div>
+
+    <div class="stat-card completed">
+      <h2>Completed Tasks</h2>
+      <p class="count">{{ completedTasks }}</p>
+    </div>
+  </div>
+</div>

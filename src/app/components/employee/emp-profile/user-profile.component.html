@@ -1,0 +1,851 @@
+<div class="profile-container">
+  <!-- User Profile Card -->
+  <div class="profile-header">
+    <img [src]="user.avatar" alt="Profile Picture" class="profile-avatar">
+    <div class="profile-info">
+      <h1 class="hname">{{user.name}}</h1>
+      <p class="role">{{user.role}}</p>
+      <p class="department">{{user.department}}</p>
+    </div>
+    <!-- Profile Update Button -->
+    <div class="profile-header-actions">
+      <p-button 
+        label="Update Profile" 
+        icon="pi pi-user-edit"
+        (click)="openProfileCompletionDialog()"
+        styleClass="p-button-outlined">
+      </p-button>
+    </div>
+  </div>
+  
+  <div class="profile-details">
+    <div class="detail-item">
+      <i class="pi pi-envelope"></i>
+      <span>{{user.email}}</span>
+    </div>
+    <div class="detail-item">
+      <i class="pi pi-phone"></i>
+      <span>{{user.phone}}</span>
+    </div>
+    <div class="detail-item">
+      <i class="pi pi-map-marker"></i>
+      <span>{{user.location || 'Matara,Sri Lanka'}}</span>
+    </div>
+    <div class="detail-item">
+      <i class="pi pi-calendar"></i>
+      <span>Joined {{user.joinDate || 'Jan 2025'}}</span>
+    </div>
+  </div>
+
+  <!-- Task Overview Card -->
+  <div class="task-overview-card">
+    <div class="card-header">
+      <h3>Task Overview Dashboard</h3>
+      <div style="display: flex; gap: 1rem;">
+        <!-- Refresh button for task data -->
+        <button pButton type="button" 
+                label="Refresh" 
+                icon="pi pi-refresh" 
+                (click)="refreshTaskData()" 
+                class="p-button-sm p-button-outlined"
+                [loading]="isLoadingTaskData">
+        </button>
+      </div>
+    </div>
+    
+    <div class="task-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ totalTasks }}</span>
+        <span class="stat-label">Total Tasks</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ completedTasks }}</span>
+        <span class="stat-label">Completed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ pendingTasks }}</span>
+        <span class="stat-label">Pending</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ inProgressTasksCount }}</span>
+        <span class="stat-label">In Progress</span>
+      </div>
+    </div>
+    
+    <!-- Additional Stats Row -->
+    <div class="task-stats" style="margin-top: 1rem;">
+      <div class="stat-item">
+        <span class="stat-value">{{ overdueTasks || '2' }}</span>
+        <span class="stat-label">Overdue</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ todayTasks || '5' }}</span>
+        <span class="stat-label">Due Today</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ totalHours || '127' }}</span>
+        <span class="stat-label">Total Hours</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ avgCompletion || '2.3' }}</span>
+        <span class="stat-label">Avg Days</span>
+      </div>
+    </div>
+    
+    <div class="progress-section">
+      <div class="progress-header">
+        <span>Overall Progress</span>
+        <span class="progress-percentage">{{ completionPercentage | number:'1.0-0' }}%</span>
+      </div>
+      <p-progressBar 
+        [value]="completionPercentage" 
+        [showValue]="false"
+        [style]="{'height': '12px'}">
+      </p-progressBar>
+    </div>
+  </div>
+
+  <!-- Task Lists -->
+  <div class="task-lists">
+    <!-- Pending Tasks -->
+    <div class="task-list">
+      <h3>Pending Tasks ({{pendingTasks}})</h3>
+      <div class="task-cards">
+        <div *ngFor="let task of pendingTasksList" class="task-card">
+          <div class="task-card-header">
+            <h4>{{task.title}}</h4>
+            <span class="priority-badge" [style.background-color]="getPriorityColor(task.priority)">
+              {{task.priority}}
+            </span>
+          </div>
+          <p class="task-description">{{task.description}}</p>
+          <div class="task-details">
+            <div class="task-time">
+              <i class="pi pi-clock"></i>
+              <span>{{task.dueTime ? formatTime(task.dueTime) : 'No time set'}}</span>
+            </div>
+            <div class="task-hours">
+              <i class="pi pi-hourglass"></i>
+              <span>{{task.estimatedHours || 0}} hours</span>
+            </div>
+          </div>
+          <div class="task-footer">
+            <span class="due-date">
+              <i class="pi pi-calendar"></i>
+              {{task.dueDate | date:'mediumDate'}}
+            </span>
+            <span class="status-badge" [style.background-color]="getStatusColor(task.status)">
+              {{task.status}}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div *ngIf="hasNoPendingTasks" class="task-card" style="text-align: center; padding: 2rem;">
+          <i class="pi pi-check-circle" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+          <h4 style="color: #a0aec0; margin-bottom: 0.5rem;">No Pending Tasks</h4>
+          <p style="color: #cbd5e0; margin: 0;">All caught up! Great work.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Tasks -->
+    <div class="task-list">
+      <h3>Completed Tasks ({{completedTasks}})</h3>
+      <div class="task-cards">
+        <div *ngFor="let task of displayedCompletedTasks; let i = index" class="task-card completed">
+          <div class="task-card-header">
+            <h4>{{task.title}}</h4>
+            <span class="priority-badge" [style.background-color]="getPriorityColor(task.priority)">
+              {{task.priority}}
+            </span>
+          </div>
+          <p class="task-description">{{task.description}}</p>
+          <div class="task-footer">
+            <span class="due-date">
+              <i class="pi pi-calendar"></i>
+              {{task.dueDate | date:'mediumDate'}}
+            </span>
+            <span class="status-badge" [style.background-color]="getStatusColor(task.status)">
+              <i class="pi pi-check" style="margin-right: 0.3rem;"></i>
+              {{task.status}}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Show more button for completed tasks -->
+        <div *ngIf="hasMoreThanThreeCompletedTasks" class="task-card" style="text-align: center; padding: 1rem;">
+          <button pButton type="button" 
+                  label="{{showAllCompleted ? 'Show Less' : 'Show All'}}" 
+                  icon="pi pi-{{showAllCompleted ? 'chevron-up' : 'chevron-down'}}" 
+                  class="p-button-sm" 
+                  (click)="showAllCompleted = !showAllCompleted">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Notifications Section -->
+  <div class="notification-section">
+    <div class="notification-header" (click)="toggleNotifications()">
+      <i class="pi pi-bell notification-bell"></i>
+      <span class="notification-badge" *ngIf="unreadNotificationCount > 0">
+        {{unreadNotificationCount}}
+      </span>
+      <span class="notification-text">Notifications</span>
+    </div>
+
+    <!-- Enhanced Notification Panel -->
+    <div class="notification-panel" *ngIf="showNotifications">
+      <!-- Notification Header with Actions -->
+      <div class="notification-panel-header">
+        <h4>Notifications</h4>
+        <div class="notification-actions">
+          <button pButton type="button" 
+                  icon="pi pi-refresh" 
+                  class="p-button-sm p-button-text" 
+                  (click)="refreshNotificationsManually()"
+                  [loading]="isLoadingNotifications"
+                  pTooltip="Refresh notifications">
+          </button>
+          <button pButton type="button" 
+                  icon="pi pi-check-circle" 
+                  class="p-button-sm p-button-text" 
+                  (click)="markAllNotificationsAsRead()"
+                  *ngIf="unreadNotificationCount > 0"
+                  pTooltip="Mark all as read">
+          </button>
+          <button pButton type="button" 
+                  icon="pi pi-times" 
+                  class="p-button-sm p-button-text" 
+                  (click)="closeNotifications()"
+                  pTooltip="Close">
+          </button>
+        </div>
+      </div>
+
+      <!-- Notification List -->
+      <div class="notification-list">
+        <!-- Loading State -->
+        <div *ngIf="isLoadingNotifications" class="notification-loading">
+          <p-progressSpinner strokeWidth="4" [style]="{'width': '30px', 'height': '30px'}"></p-progressSpinner>
+          <span>Loading notifications...</span>
+        </div>
+
+        <!-- No Notifications -->
+        <div *ngIf="!isLoadingNotifications && notifications.length === 0" class="no-notifications">
+          <i class="pi pi-bell-slash" style="font-size: 2rem; color: #cbd5e0; margin-bottom: 0.5rem;"></i>
+          <h5 style="color: #a0aec0; margin-bottom: 0.25rem;">No notifications</h5>
+          <p style="color: #cbd5e0; margin: 0; font-size: 0.875rem;">You're all caught up!</p>
+          
+          <!-- Debug info for troubleshooting -->
+          <div class="notification-debug-info" style="margin-top: 1rem;">
+            <p><strong>Troubleshooting:</strong></p>
+            <p>If you expect notifications but don't see any:</p>
+            <ol style="font-size: 0.8rem; margin: 0.5rem 0; padding-left: 1rem;">
+              <li>Check browser console for error messages</li>
+              <li>Click the debug button (⚙️) above to test connection</li>
+              <li>Ensure you're logged in properly</li>
+              <li>Contact administrator if issue persists</li>
+            </ol>
+            <button pButton type="button" 
+                    label="Retry Loading" 
+                    icon="pi pi-refresh" 
+                    class="p-button-sm" 
+                    (click)="refreshNotificationsManually()">
+            </button>
+          </div>
+        </div>
+
+        <!-- Notification Items -->
+        <div *ngFor="let notification of notifications; trackBy: trackNotificationBy" 
+             class="notification-item" 
+             [class.unread]="!notification.read"
+             (click)="markNotificationAsRead(notification)">
+          
+          <div class="notification-content">
+            <div class="notification-header-info">
+              <span class="notification-title">{{notification.title}}</span>
+              <span class="notification-time">{{getNotificationTimeAgo(notification)}}</span>
+            </div>
+            <div class="notification-message">{{getNotificationDisplayText(notification)}}</div>
+            
+            <!-- Task-related notification indicator -->
+            <div *ngIf="notification.taskId" class="notification-tag">
+              <i class="pi pi-bookmark"></i>
+              <span>Task Related</span>
+            </div>
+          </div>
+
+          <div class="notification-status" *ngIf="!notification.read">
+            <span class="unread-dot"></span>
+          </div>
+        </div>
+
+        <!-- Load More (if needed) -->
+        <div *ngIf="notifications.length > 10" class="notification-load-more">
+          <button pButton type="button" 
+                  label="Load older notifications" 
+                  class="p-button-sm p-button-text" 
+                  icon="pi pi-chevron-down">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Dialog (unchanged) -->
+<p-dialog header="Add New Task" [(visible)]="showAddTaskDialog" [style]="{width: '500px'}" [modal]="true">
+  <div class="dialog-content">
+    <div class="field">
+      <label for="title">Task Title</label>
+      <input id="title" type="text" pInputText [(ngModel)]="newTask.title" placeholder="Enter task title">
+    </div>
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" pInputTextarea [(ngModel)]="newTask.description" rows="3" placeholder="Enter task description"></textarea>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="estimatedHours">Estimated Hours</label>
+        <p-inputNumber id="estimatedHours" [(ngModel)]="newTask.estimatedHours" [min]="1" [max]="24" [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal" decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"></p-inputNumber>
+      </div>
+      <div class="field">
+        <label for="priority">Priority</label>
+        <select id="priority" [(ngModel)]="newTask.priority" class="p-inputtext">
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category" [(ngModel)]="newTask.category" class="p-inputtext">
+        <option value="development">Development</option>
+        <option value="design">Design</option>
+        <option value="testing">Testing</option>
+        <option value="meeting">Meeting</option>
+        <option value="research">Research</option>
+        <option value="documentation">Documentation</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="assignee">Assign To</label>
+      <select id="assignee" [(ngModel)]="newTask.assignee" class="p-inputtext">
+        <option value="self">Myself</option>
+        <option value="team">Team Member</option>
+        <option value="manager">Manager</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="dueDate">Due Date</label>
+        <p-calendar id="dueDate" [(ngModel)]="newTask.dueDate" [showIcon]="true" dateFormat="dd/mm/yy"></p-calendar>
+      </div>
+      <div class="field">
+        <label for="dueTime">Due Time</label>
+        <select id="dueTime" [(ngModel)]="newTask.dueTime" class="p-inputtext">
+          <option *ngFor="let time of timeOptions" [value]="time">{{formatTime(time)}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" (click)="showAddTaskDialog = false" class="p-button-text"></button>
+    <button pButton label="Save Draft" icon="pi pi-save" (click)="saveDraft()" class="p-button-text"></button>
+    <button pButton label="Add Task" icon="pi pi-check" (click)="addTask()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Task Analytics Dialog (unchanged) -->
+<p-dialog header="Task Analytics" [(visible)]="showAnalyticsDialog" [style]="{width: '800px'}" [modal]="true">
+  <div class="dialog-content">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+      <div class="chart-container" style="box-shadow: none; border: 1px solid #e2e8f0;">
+        <h4 style="margin-bottom: 1rem;">Priority Distribution</h4>
+        <p-chart type="doughnut" [data]="priorityChartData" [options]="doughnutOptions" width="100%" height="200px"></p-chart>
+      </div>
+      <div class="chart-container" style="box-shadow: none; border: 1px solid #e2e8f0;">
+        <h4 style="margin-bottom: 1rem;">Status Overview</h4>
+        <p-chart type="bar" [data]="statusChartData" [options]="barOptions" width="100%" height="200px"></p-chart>
+      </div>
+    </div>
+    <div class="productivity-metrics" style="box-shadow: none; border: 1px solid #e2e8f0;">
+      <h4 style="margin-bottom: 1rem;">Performance Insights</h4>
+      <div class="metric-item">
+        <span class="metric-label">Most Productive Day</span>
+        <span class="metric-value">Tuesday</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Peak Performance Time</span>
+        <span class="metric-value">10:00 AM - 12:00 PM</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Average Task Duration</span>
+        <span class="metric-value">4.2 hours</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Completion Rate</span>
+        <span class="metric-value">87%</span>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Export Report" icon="pi pi-download" (click)="exportAnalytics()" class="p-button-text"></button>
+    <button pButton label="Close" icon="pi pi-times" (click)="showAnalyticsDialog = false"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Profile Completion Dialog (unchanged) -->
+<p-dialog 
+  header="Update Your Profile" 
+  [(visible)]="showProfileCompletionDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="profile-completion-dialog"
+  [style]="{width: '500px', maxWidth: '90vw'}"
+  (onHide)="onProfileDialogHide()">
+  
+  <div class="profile-completion-content">
+    <!-- Loading indicator while fetching current profile -->
+    <div *ngIf="isSubmittingProfile && !currentUserProfile" 
+         class="loading-container" 
+         style="text-align: center; padding: 2rem;">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <p style="margin-top: 1rem; color: #6b7280;">Loading profile data...</p>
+    </div>
+
+    <!-- Form content (only show when profile is loaded) -->
+    <div *ngIf="currentUserProfile && !isSubmittingProfile">
+      <div class="completion-header">
+        <i class="pi pi-user-edit completion-icon" style="font-size: 3rem; color: #3b82f6; margin-bottom: 1rem;"></i>
+        <h3 style="margin-bottom: 0.5rem; color: #1f2937;">Update Your Profile Information</h3>
+        <p style="color: #6b7280; margin-bottom: 1rem;">
+          Welcome, {{currentUserProfile.firstname}} {{currentUserProfile.lastname}}
+        </p>
+        <p style="color: #6b7280; margin-bottom: 2rem;">Please update your department and role information</p>
+      </div>
+
+      <form [formGroup]="profileCompletionForm" (ngSubmit)="submitProfileCompletion()">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="department" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">
+            Department <span style="color: #ef4444;">*</span>
+          </label>
+          <p-dropdown
+            id="department"
+            formControlName="departmentId"
+            [options]="Teams"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select Department"
+            [style]="{'width': '100%'}"
+            [showClear]="false"
+            [class.ng-invalid]="profileCompletionForm.get('departmentId')?.invalid && profileCompletionForm.get('departmentId')?.touched">
+          </p-dropdown>
+          <small class="error-message" 
+                 *ngIf="profileCompletionForm.get('departmentId')?.invalid && 
+                        profileCompletionForm.get('departmentId')?.touched"
+                 style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+            Department is required
+          </small>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 2rem;">
+          <label for="role" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">
+            Role <span style="color: #ef4444;">*</span>
+          </label>
+          <p-dropdown
+            id="role"
+            formControlName="roleId"
+            [options]="roles"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select Role"
+            [style]="{'width': '100%'}"
+            [showClear]="false"
+            [class.ng-invalid]="profileCompletionForm.get('roleId')?.invalid && profileCompletionForm.get('roleId')?.touched">
+          </p-dropdown>
+          <small class="error-message" 
+                 *ngIf="profileCompletionForm.get('roleId')?.invalid && 
+                        profileCompletionForm.get('roleId')?.touched"
+                 style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+            Role is required
+          </small>
+        </div>
+
+        <div class="form-actions" style="text-align: center;">
+          <p-button 
+            type="submit"
+            label="Update Profile"
+            icon="pi pi-check"
+            [loading]="isSubmittingProfile"
+            [disabled]="profileCompletionForm.invalid || isSubmittingProfile"
+            styleClass="p-button-primary profile-submit-btn"
+            [style]="{'width': '100%', 'padding': '0.75rem 1.5rem'}">
+          </p-button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Submitting indicator -->
+    <div *ngIf="isSubmittingProfile && currentUserProfile" 
+         class="submitting-container" 
+         style="text-align: center; padding: 2rem;">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <p style="margin-top: 1rem; color: #6b7280;">Updating profile...</p>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- Enhanced Styles for notifications and profile -->
+<style>
+/* Profile Header Actions */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.profile-header-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.profile-update-btn {
+  background: transparent !important;
+  color: #3b82f6 !important;
+  border: 1px solid #3b82f6 !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-update-btn:hover {
+  background: #3b82f6 !important;
+  color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Enhanced Notification Styles */
+.notification-section {
+  position: relative;
+  margin: 1rem;
+}
+
+.notification-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.notification-header:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notification-bell {
+  font-size: 1.25rem;
+  color: #3b82f6;
+}
+
+.notification-text {
+  font-weight: 500;
+  color: #374151;
+}
+
+.notification-badge {
+  background-color: #ef4444;
+  color: white;
+  border-radius: 50%;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 1.5rem;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+/* New notification pulse animation */
+.new-notification-pulse {
+  animation: notificationPulse 2s ease-in-out;
+}
+
+@keyframes notificationPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.3); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.notification-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 350px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  z-index: 1000;
+  max-height: 500px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.notification-panel-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+}
+
+.notification-panel-header h4 {
+  margin: 0;
+  color: #374151;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-loading {
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+.notification-item {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+  background-color: #f8fafc;
+}
+
+.notification-item.unread {
+  background-color: #eff6ff;
+  border-left: 3px solid #3b82f6;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.notification-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.notification-message {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.notification-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.notification-status {
+  display: flex;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.unread-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.no-notifications {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.notification-load-more {
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid #f3f4f6;
+}
+
+/* Profile completion dialog styles */
+.profile-completion-dialog .p-dialog-content {
+  padding: 2rem;
+}
+
+.completion-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.completion-icon {
+  display: block;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.profile-submit-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .profile-header-actions {
+    position: static;
+    width: 100%;
+  }
+
+  .profile-update-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .notification-panel {
+    width: 320px;
+    right: -10px;
+  }
+}
+
+/* Task card styles (if needed) */
+.task-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.task-card.completed {
+  opacity: 0.8;
+  background: #f8fafc;
+}
+
+/* Debug button (enable during development) */
+.debug-button {
+  background: #f59e0b !important;
+  color: white !important;
+  border: 1px solid #f59e0b !important;
+}
+
+.debug-button:hover {
+  background: #d97706 !important;
+  border-color: #d97706 !important;
+}
+
+/* Show debug info in console */
+.notification-debug-info {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: #92400e;
+}
+</style>

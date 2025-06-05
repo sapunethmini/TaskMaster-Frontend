@@ -1,0 +1,123 @@
+  <div class="dashboard-container">
+      
+
+        <div class="dashboard-title">
+            <h1>Dashboard</h1>
+            <div class="dashboard-header">
+            <div class="user-actions">
+                <div class="notification-icon">
+                    <i class="pi pi-bell"></i>
+                    <span class="notification-badge">2</span>
+                </div>
+                <div class="user-avatar">JD</div>
+            </div>
+        </div>
+        </div>
+
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-header">Total Tasks</div>
+                <div class="stat-value">156</div>
+                <div class="stat-growth positive">
+                    <i class="pi pi-arrow-up"></i> 12% from last month
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">Completed</div>
+                <div class="stat-value completed">89</div>
+                <div class="stat-growth positive">
+                    <i class="pi pi-arrow-up"></i> 8% from last month
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">In Progress</div>
+                <div class="stat-value in-progress">42</div>
+                <div class="stat-growth positive">
+                    <i class="pi pi-arrow-up"></i> 15% from last month
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">Pending</div>
+                <div class="stat-value pending">25</div>
+                <div class="stat-growth positive">
+                    <i class="pi pi-arrow-up"></i> 5% from last month
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="section-header">
+                <h2>Task Trends & Predictions</h2>
+                <p class="section-description">Historical data and forecasted task completion trends</p>
+            </div>
+            
+            <div class="trends-content">
+                <!-- Chart Column (2/3 width) -->
+                <div class="chart-column">
+                    <div class="chart-header">
+                        <h3>Task Completion Trends</h3>
+                        <div class="chart-legend">
+                            <span class="legend-item">
+                                <span class="legend-dot completed"></span>
+                                Historical Data
+                            </span>
+                            <span class="legend-item">
+                                <span class="legend-dot predicted"></span>
+                                Predictions
+                            </span>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <p-chart 
+                            type="line" 
+                            [data]="chartData" 
+                            [options]="chartOptions"
+                            style="width: 100%; height: 100%;">
+                        </p-chart>
+                    </div>
+                </div>
+
+                <!-- Analysis Column (1/3 width) -->
+                <div class="analysis-column">
+                    <div class="analysis-card">
+                        <div class="analysis-header">
+                            <div class="analysis-icon">
+                                <i class="pi pi-chart-line"></i>
+                            </div>
+                            <h4 class="analysis-title">Trend Analysis</h4>
+                        </div>
+                        <div class="analysis-content">
+                            Based on historical patterns, task completion is trending needs attention
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-header">
+                            <div class="analysis-icon">
+                                <i class="pi pi-calendar"></i>
+                            </div>
+                            <h4 class="analysis-title">Next Month Forecast</h4>
+                        </div>
+                        <div class="analysis-content">
+                            Estimated 19 tasks to be completed
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-header">
+                            <div class="analysis-icon">
+                                <i class="pi pi-exclamation-triangle"></i>
+                            </div>
+                            <h4 class="analysis-title">Workload Alert</h4>
+                        </div>
+                        <div class="analysis-content">
+                            Low workload expected
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

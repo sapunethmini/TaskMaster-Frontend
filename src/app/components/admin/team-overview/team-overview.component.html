@@ -1,0 +1,163 @@
+
+  <!-- Top Row: Task Priority Overview AND Task Completion Status -->
+  <div class="row top-row">
+    <!-- Task Priority Overview -->
+    <div class="card">
+      <h2 class="card-title">Task Priority Overview</h2>
+      <div class="chart-container">
+        <div class="donut-chart-wrapper">
+          <canvas id="priorityChart" width="300" height="300"></canvas>
+          <div class="chart-center-text">
+            <div class="total-tasks">{{taskStats.total}}</div>
+          </div>
+        </div>
+        <!-- Removed the custom chart-legend div - Chart.js will handle the legend -->
+      </div>
+    </div>
+
+    <!-- Task Completion Status -->
+    <div class="card">
+      <h2 class="card-title">Task Completion Status</h2>
+      <div class="completion-content">
+        <!-- Circular Progress -->
+        <div class="progress-container">
+          <svg class="progress-ring" width="200" height="200">
+            <circle class="progress-ring-background" cx="100" cy="100" [attr.r]="radius"></circle>
+            <circle 
+              class="progress-ring-progress" 
+              cx="100" 
+              cy="100" 
+              [attr.r]="radius"
+              [style.stroke-dasharray]="circumference"
+              [style.stroke-dashoffset]="strokeDashoffset"
+            ></circle>
+            <!-- Add decorative circles around the progress ring -->
+            <circle class="progress-decoration" cx="100" cy="15" r="4" fill="#3b82f6" opacity="0.7">
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle class="progress-decoration" cx="170" cy="60" r="3" fill="#3b82f6" opacity="0.5">
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.3s" repeatCount="indefinite" />
+            </circle>
+            <circle class="progress-decoration" cx="40" cy="140" r="5" fill="#3b82f6" opacity="0.6">
+              <animate attributeName="opacity" values="0.6;0.3;0.6" dur="1.8s" repeatCount="indefinite" />
+            </circle>
+          </svg>
+          <div class="progress-text">
+            <div class="progress-percentage">0%</div>
+            <div class="progress-label">Completed</div>
+          </div>
+        </div>
+
+        <!-- Task Stats -->
+        <div class="stats-list">
+          <div class="stat-item">
+            <span class="stat-label">Total Tasks:</span>
+            <span class="stat-value">{{ taskStats.total }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Completed:</span>
+            <span class="stat-value text-green">{{ taskStats.completed }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">In Progress:</span>
+            <span class="stat-value text-blue">{{ taskStats.inProgress }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Not Started:</span>
+            <span class="stat-value text-yellow">{{ taskStats.notStarted }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Overdue:</span>
+            <span class="stat-value text-red">{{ taskStats.overdue }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row: Priority Task Cards AND Team Contacts -->
+<div class="row bottom-row">
+  <!-- Priority Task Cards -->
+  <div class="card priority-cards-section">
+    <h2 class="card-title">Task Priority Distribution</h2>
+    <div class="priority-cards-container">
+      <!-- High Priority Card -->
+      <div class="priority-task-card high-priority-card" (click)="onPriorityCardClick('HIGH')" style="cursor: pointer;">
+        <div class="card-content">
+          <div class="task-count">{{ priorityStats.high }}</div>
+          <div class="task-label">High Priority Task</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Medium Priority Card -->
+      <div class="priority-task-card medium-priority-card" (click)="onPriorityCardClick('MEDIUM')" style="cursor: pointer;">
+        <div class="card-content">
+          <div class="task-count">{{ priorityStats.medium }}</div>
+          <div class="task-label">Medium Priority Task</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Low Priority Card -->
+      <div class="priority-task-card low-priority-card" (click)="onPriorityCardClick('LOW')" style="cursor: pointer;">
+        <div class="card-content">
+          <div class="task-count">{{ priorityStats.low }}</div>
+          <div class="task-label">Low Priority Task</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="priority-legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #EF4444;"></div>
+        <span class="legend-text">High Priority</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #F59E0B;"></div>
+        <span class="legend-text">Medium Priority</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #10B981;"></div>
+        <span class="legend-text">Low Priority</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Contacts -->
+  <div class="card">
+    <h2 class="card-title">Team Contacts</h2>
+    <div class="contact-card">
+      <div class="contact-profile">
+        <div class="contact-avatar">
+          <svg class="contact-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#3B82F6"/>
+          </svg>
+        </div>
+        <h3 class="contact-name">{{ teamLeader.name }}</h3>
+        <p class="contact-title">{{ teamLeader.title }}</p>
+      </div>
+      
+      <button class="contact-button">
+        Contact Team Leader
+        <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

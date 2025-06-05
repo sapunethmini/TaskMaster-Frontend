@@ -1,0 +1,22 @@
+<div class="layout-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2 class="app-title">Hi Employee</h2>
+    </div>
+    <nav class="nav-menu">
+      <ul>
+        <li *ngFor="let item of menuItems">
+          <a [routerLink]="item.routerLink" 
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="item.routerLinkActiveOptions">
+            <i [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  <main class="content-area">
+    <router-outlet></router-outlet>
+  </main>
+</div> 

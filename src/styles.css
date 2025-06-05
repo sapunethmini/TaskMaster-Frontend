@@ -1,0 +1,16 @@
+@import "primeicons/primeicons.css";
+
+/* Force PrimeIcons to be visible */
+.pi {
+  font-family: 'primeicons' !important;
+  display: inline-block !important;
+}
+
+/* Ensure buttons have correct sizing */
+button.p-button-rounded {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}

@@ -1,0 +1,431 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ==== Keyframe Animations ==== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+@keyframes backgroundFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+/* ==== fixed layers ==== */
+.signup-page, #stars, .brick-wall, .lamp-glow {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.1s forwards;
+}
+
+/* snow canvas behind everything but above dark overlay */
+#snow {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  inset: 0;
+  z-index: -1;          /* keep below .wrapper (z-index: 1) */
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;     /* hide snowflakes outside canvas */
+  filter: blur(4px);    /* optional: add slight blur */
+  animation: fadeIn 2s ease-out 0.8s forwards;
+}
+
+/* 1. twinkling stars are on <canvas> (#stars) — handled by JS */
+#stars {
+  opacity: 0;
+  animation: fadeIn 2s ease-out 0.5s forwards;
+}
+
+/* 2. dark-blue brick wall texture */
+.brick-wall {
+  background: url("../../../../assest/img/img14.png") center / cover no-repeat;
+  opacity: 0;          /* let stars shine through */
+  pointer-events: none;
+  z-index: -1;
+  animation: backgroundFade 1.5s ease-out 0.2s forwards;
+}
+
+/* 3. blue lamp glow */
+.lamp-glow {
+  top: 80px;
+  width: 600px;
+  height: 360px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+      ellipse at center,
+      rgba(0, 140, 255, .70) 0%,
+      rgba(0, 140, 255, .25) 45%,
+      rgba(0, 140, 255, .04) 80%,
+      rgba(0, 140, 255, 0) 100%
+  );
+  filter: blur(70px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* ==== signup card ==== */
+.signup-container {
+  position: relative;
+  z-index: 10;           /* above everything else */
+  width: 420px;
+  margin: auto;
+  background: rgba(255, 255, 255, .08);
+  border: 2px solid rgba(255, 255, 255, .2);
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+  color: #fff;
+  padding: 32px 44px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, .3);
+  margin-top: 10rem;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: fadeInUp 0.8s ease-out 0.6s forwards;
+}
+
+.signup-container h2 {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 24px;
+  color: #ffffff;
+  font-weight: 500;
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out 1.2s forwards;
+}
+
+.form-group {
+  display: grid;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Target form-groups correctly as children of the form */
+.signup-form .form-group:nth-child(1) {
+  animation: fadeInUp 0.5s ease-out 1.4s forwards;
+}
+
+.signup-form .form-group:nth-child(2) {
+  animation: fadeInUp 0.5s ease-out 1.6s forwards;
+}
+
+.signup-form .form-group:nth-child(3) {
+  animation: fadeInUp 0.5s ease-out 1.8s forwards;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+/* Input fields */
+.input-box {
+  width: 100%;
+  height: 50px;
+  position: relative;
+  margin: 8px 0;
+}
+
+.form-input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, .3);
+  border-radius: 40px;
+  font-size: 16px;
+  color: #fff;
+  padding: 0 48px 0 20px;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: rgba(0, 170, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: #fff;
+}
+
+.input-box i {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  color: #fff;
+  transition: color 0.3s ease;
+}
+
+.form-input:focus + i {
+  color: #0af;
+}
+
+/* Password visibility toggle icon */
+.password-field {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  margin: 8px 0;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #fff;
+  background: none;
+  border: none;
+  font-size: 22px;
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: #0af;
+}
+
+/* Terms and conditions */
+.terms-text {
+  color: #ffffff;
+  font-size: 14px;
+  text-align: left;
+  display: flex;
+  margin-top: 5px;
+  margin-bottom: 30px;
+  margin-left: 8px;
+  opacity: 0;
+  animation: slideInFromLeft 0.5s ease-out 2.0s forwards;
+}
+
+.terms-text a {
+  color: #0af;
+  text-decoration: none;
+  margin-left: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.terms-text a:hover {
+  text-decoration: underline;
+  color: #00d4ff;
+}
+
+/* Submit button */
+.submit-button {
+  width: 100%;
+  height: 45px;
+  background: #0af;
+  border: none;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease-out 2.2s forwards;
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .35);
+  background: linear-gradient(45deg, #0af, #00d4ff);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.signup-link {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 24px;
+  color: #ffffff;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out 2.6s forwards;
+}
+
+.signup-link a {
+  color: #0af;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+  color: #00d4ff;
+}
+
+/* Error messages */
+.error-message {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 5px;
+  margin-left: 20px;
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.error-alert {
+  background: rgba(255, 107, 107, 0.2);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 15px;
+  color: #ff6b6b;
+  font-size: 14px;
+  text-align: center;
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Prevent autofill background color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Loading Animation for Page Start */
+.signup-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #000428, #004e92);
+  z-index: 1000;
+  opacity: 1;
+  animation: pageLoadFade 1.5s ease-out forwards;
+}
+
+@keyframes pageLoadFade {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Enhanced focus effects */
+.form-input:focus {
+  animation: inputFocus 0.3s ease-out;
+}
+
+@keyframes inputFocus {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 460px) {
+  .signup-container {
+    width: 90%;
+    padding: 28px 28px;
+  }
+}

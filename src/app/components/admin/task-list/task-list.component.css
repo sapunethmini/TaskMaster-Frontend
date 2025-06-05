@@ -1,0 +1,239 @@
+.task-list-container {
+  padding: 20px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Filters Section */
+.filters-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filters-title {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.filters-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.filter-item label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+/* Table Section */
+.table-section {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom PrimeNG Table Styles */
+::ng-deep .task-table {
+  .p-datatable-header {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .p-datatable-thead > tr > th {
+    background: #f9fafb;
+    color: #374151;
+    font-weight: 600;
+    font-size: 18px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background-color: #f9fafb;
+  }
+
+  .p-datatable-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+}
+
+/* Task Content Styles */
+.task-title {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.status-tag {
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 10px;
+  text-align: center;
+  width: 100px;
+}
+
+.team-badge {
+  display: inline-block;
+  background-color: white !important;
+  color: #374151;
+  border: 2px solid #3b82f6;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  width: 100px;
+}
+
+.priority {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+  width: 100px;
+}
+
+.user-id {
+  color: #3b82f6;
+  font-size: 16px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.duration {
+  color: #6b7280;
+  font-size: 16px;
+  margin-left: 22px;
+}
+
+.date-time {
+  color: #6b7280;
+  font-size: 15px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Custom Dropdown Styles */
+::ng-deep .filter-dropdown {
+  .p-dropdown {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+  }
+
+  .p-dropdown:not(.p-disabled):hover {
+    border-color: #9ca3af;
+  }
+
+  .p-dropdown:not(.p-disabled).p-focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Custom Tag Colors for Status - Light/Matte Colors */
+
+  .p-tag.status-completed {
+    background: #93f5c2 !important;
+    color: #373939 !important;
+    border: 1px solid #a7f3d0 !important;
+  }
+
+  .p-tag.status-in-progress {
+    background: #e9f193 !important;
+    color: #373939 !important;
+    border: 1px solid #93c5fd !important;
+
+  }
+
+  .p-tag.status-todo {
+    background: #f8c2f2 !important;
+    color: #374151 !important;
+    border: 1px solid #d1d5db !important;
+
+  }
+
+  .p-tag.status-default {
+    background: #fabd9e !important;
+    color: #374151 !important;
+    border: 1px solid #d1d5db !important;
+
+  }
+
+
+/* Priority Colors - Light/Matte Colors */
+.priority-high {
+  background: #f8cdcd !important;
+  color: #de0000 !important;
+  border: 1px solid #fecaca !important;
+}
+
+.priority-medium {
+  background: #f5e9bb !important;
+  color: #dc5a09 !important;
+  border: 1px solid #fde68a !important;
+}
+
+.priority-low {
+  background: #d1fae5 !important;
+  color: #04e657 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+.priority-default {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filters-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .filter-item {
+    min-width: 100%;
+  }
+  
+  .task-list-container {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .filters-row {
+    flex-wrap: wrap;
+  }
+  
+  .filter-item {
+    flex: 1;
+    min-width: 160px;
+  }
+}

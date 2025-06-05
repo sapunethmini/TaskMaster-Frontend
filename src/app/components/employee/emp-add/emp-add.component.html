@@ -1,0 +1,140 @@
+<div class="employee-form-container">
+  <div class="form-header">
+    <div class="header-content">
+      <h2>Add New Employee</h2>
+      <p>Enter the details of the new employee to add them to the system</p>
+    </div>
+    <div class="form-indicator">
+      <span class="indicator-step active">1</span>
+      <span class="indicator-label">Employee Details</span>
+    </div>
+  </div>
+
+  <!-- Error message alert -->
+  <div *ngIf="errorMessage" class="error-alert">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ errorMessage }}</span>
+    <button class="close-btn" (click)="errorMessage = ''">×</button>
+  </div>
+
+  <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
+    <div class="form-section">
+      <h3 class="section-title">Personal Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstname">First Name</label>
+          <input 
+            type="text" 
+            id="firstname" 
+            class="form-control" 
+            formControlName="firstname"
+            placeholder="Enter first name">
+          <small *ngIf="submitted && f['firstname'].errors?.['required']" class="error-text">
+            First name is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="lastname">Last Name</label>
+          <input 
+            type="text" 
+            id="lastname" 
+            class="form-control" 
+            formControlName="lastname"
+            placeholder="Enter last name">
+          <small *ngIf="submitted && f['lastname'].errors?.['required']" class="error-text">
+            Last name is required
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          class="form-control" 
+          formControlName="email"
+          placeholder="Enter email address">
+        <small *ngIf="submitted && f['email'].errors?.['required']" class="error-text">
+          Email is required
+        </small>
+        <small *ngIf="submitted && f['email'].errors?.['email']" class="error-text">
+          Please enter a valid email address
+        </small>
+      </div>
+    </div>
+
+    <!-- Company Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Company Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="Team_Id">Team</label>
+          <div class="custom-dropdown" [class.invalid]="submitted && f['Team_Id'].errors">
+            <div class="dropdown-selected" (click)="toggleDropdown('Team', $event)">
+              <span *ngIf="!employeeForm.value.Team_Id">Select Team</span>
+              <span *ngIf="employeeForm.value.Team_Id">
+                {{ getTeamName(employeeForm.value.Team_Id) }}
+              </span>
+              <span class="dropdown-icon">
+                <i class="pi pi-chevron-down"></i>
+              </span>
+            </div>
+            <div class="dropdown-options" *ngIf="TeamDropdownOpen">
+              <div 
+                *ngFor="let dept of Teams" 
+                class="dropdown-option"
+                (click)="selectTeam(dept.id)">
+                {{ dept.name }}
+              </div>
+            </div>
+            <input type="hidden" formControlName="Team_Id">
+          </div>
+          <small *ngIf="submitted && f['Team_Id'].errors?.['required']" class="error-text">
+            Team is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="role_Id">Role</label>
+          <div class="custom-dropdown" [class.invalid]="submitted && f['role_Id'].errors">
+            <div class="dropdown-selected" (click)="toggleDropdown('role', $event)">
+              <span *ngIf="!employeeForm.value.role_Id">Select Role</span>
+              <span *ngIf="employeeForm.value.role_Id">
+                {{ getRoleName(employeeForm.value.role_Id) }}
+              </span>
+              <span class="dropdown-icon">
+                <i class="pi pi-chevron-down"></i>
+              </span>
+            </div>
+            <div class="dropdown-options" *ngIf="roleDropdownOpen">
+              <div 
+                *ngFor="let role of roles" 
+                class="dropdown-option"
+                (click)="selectRole(role.id)">
+                {{ role.name }}
+              </div>
+            </div>
+            <input type="hidden" formControlName="role_Id">
+          </div>
+          <small *ngIf="submitted && f['role_Id'].errors?.['required']" class="error-text">
+            Role is required
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isLoading">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner"></span>
+        <span>{{ isLoading ? 'Adding...' : 'Add Employee' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

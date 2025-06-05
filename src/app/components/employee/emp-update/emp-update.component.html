@@ -1,0 +1,143 @@
+<div class="employee-update-container">
+  <p-toast></p-toast>
+
+  <div class="card">
+    <div class="form-header">
+      <div class="header-content">
+        <h2>Update Employee</h2>
+        <p>Modify the employee details and submit to update the record</p>
+      </div>
+      <div class="form-indicator">
+        <span class="indicator-step active">1</span>
+        <span class="indicator-label">Employee Details</span>
+      </div>
+    </div>
+
+    <!-- Error message display -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading-indicator">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading employee data...</span>
+    </div>
+
+    <form *ngIf="!isLoading && !errorMessage" [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <h3 class="section-title">Personal Information</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstname">First Name</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <i class="pi pi-user"></i>
+              </span>
+              <input 
+                type="text" 
+                id="firstname" 
+                class="form-control" 
+                formControlName="firstname"
+                placeholder="Enter first name">
+            </div>
+            <small *ngIf="f['firstname'].invalid && f['firstname'].touched" class="error-text">
+              First name is required
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="lastname">Last Name</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <i class="pi pi-user"></i>
+              </span>
+              <input 
+                type="text" 
+                id="lastname" 
+                class="form-control" 
+                formControlName="lastname"
+                placeholder="Enter last name">
+            </div>
+            <small *ngIf="f['lastname'].invalid && f['lastname'].touched" class="error-text">
+              Last name is required
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <i class="pi pi-envelope"></i>
+            </span>
+            <input 
+              type="email" 
+              id="email" 
+              class="form-control" 
+              formControlName="email"
+              placeholder="Enter email address">
+          </div>
+          <small *ngIf="f['email'].invalid && f['email'].touched" class="error-text">
+            Valid email is required
+          </small>
+        </div>
+      </div>
+
+      <!-- Company Information Section -->
+      <div class="form-section">
+        <h3 class="section-title">Company Information</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="department_Id">Department</label>
+            <div class="p-field">
+              <select 
+                id="department_Id"
+                formControlName="department_Id"
+                class="form-control"
+              >
+                <option value="">Select Department</option>
+                <option *ngFor="let dept of teamOptions" [value]="dept.value">{{ dept.label }}</option>
+              </select>
+            </div>
+            <small *ngIf="f['department_Id'].invalid && f['department_Id'].touched" class="error-text">
+              Department is required
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="role_Id">Role</label>
+            <div class="p-field">
+              <select 
+                id="role_Id"
+                formControlName="role_Id"
+                class="form-control"
+              >
+                <option value="">Select Role</option>
+                <option *ngFor="let role of roleOptions" [value]="role.value">{{ role.label }}</option>
+              </select>
+            </div>
+            <small *ngIf="f['role_Id'].invalid && f['role_Id'].touched" class="error-text">
+              Role is required
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          <i class="pi pi-times"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="employeeForm.invalid || isSubmitting">
+          <i class="pi pi-save"></i> 
+          <span *ngIf="isSubmitting" class="spinner"></span>
+          {{ isSubmitting ? 'Updating...' : 'Update Employee' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

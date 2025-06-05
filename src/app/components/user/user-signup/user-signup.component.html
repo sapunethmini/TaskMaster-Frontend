@@ -1,0 +1,69 @@
+<!-- user-signup.component.html -->
+<div class="signup-page">
+  <!-- animated star canvas -->
+  <canvas id="stars"></canvas>
+  
+  <!-- static brick wall overlay -->
+  <div class="brick-wall"></div>
+  
+  <!-- blue lamp glow -->
+  <div class="lamp-glow"></div>
+  
+  <!-- snow canvas -->
+  <canvas id="snow"></canvas>
+  
+  <!-- glassmorphic signup card -->
+  <div class="signup-container">
+    <h2>Create an Account</h2>
+    
+    <form class="signup-form" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <div class="input-box">
+          <input type="text" id="username" class="form-input" placeholder="Username" formControlName="username" autocomplete="off">
+          <i class="bx bxs-user"></i>
+        </div>
+        <div *ngIf="submitted && f['username'].errors" class="error-message">
+          <span *ngIf="f['username'].errors['required']">Username is required</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="input-box">
+          <input type="password" id="password" class="form-input" placeholder="Password" formControlName="password" autocomplete="new-password">
+          <i class="bx bxs-lock-alt"></i>
+        </div>
+        <div *ngIf="submitted && f['password'].errors" class="error-message">
+          <span *ngIf="f['password'].errors['required']">Password is required</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="input-box">
+          <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm Password" formControlName="confirmPassword" autocomplete="new-password">
+          <i class="bx bxs-lock-alt"></i>
+        </div>
+        <div *ngIf="submitted && f['confirmPassword'].errors" class="error-message">
+          <span *ngIf="f['confirmPassword'].errors['required']">Please confirm your password</span>
+        </div>
+        <div *ngIf="submitted && signupForm.hasError('passwordMismatch') && !f['confirmPassword'].errors" class="error-message">
+          Passwords do not match
+        </div>
+      </div>
+      
+      <p class="terms-text">I agree to the <a href="#">Terms and Conditions</a></p>
+      
+      <button type="submit" class="submit-button" [disabled]="loading">
+        <span *ngIf="loading">Loading...</span>
+        <span *ngIf="!loading">Sign Up</span>
+      </button>
+      
+      <div *ngIf="errorMessage" class="error-alert">
+        {{ errorMessage }}
+      </div>
+      
+      <div class="signup-link">
+        <p>Already have an account? <a href="/login">Login</a></p>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,135 @@
+<div class="employee-directory">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <div class="card">
+    <div class="page-header">
+      <h2>{{pageTitle}}</h2>
+      <button 
+        pButton 
+        type="button" 
+        icon="pi pi-arrow-left" 
+        label="Back to Teams" 
+        class="p-button-text"
+        (click)="router.navigate(['/admin/team-management'])">
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+      <button class="refresh-button" pButton type="button" icon="pi pi-refresh" (click)="refreshList()"></button>
+    </div>
+
+    <div class="search-container">
+      <div class="p-inputgroup search-input">
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          pInputText 
+          [placeholder]="searchType === 'id' ? 'Search by Employee ID...' : 'Search by Employee Name...'" 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+        />
+      </div>
+      
+      <div class="search-buttons">
+        <button 
+          pButton 
+          type="button"
+          label="Search by Name" 
+          icon="pi pi-sort-amount-down"
+          class="p-button-outlined search-button" 
+          [class.active-search]="searchType === 'name'"
+          (click)="setSearchType('name')"
+        ></button>
+        <button 
+          pButton 
+          type="button"
+          label="Search by ID" 
+          icon="pi pi-sort-amount-down"
+          class="p-button-outlined search-button" 
+          [class.active-search]="searchType === 'id'"
+          (click)="setSearchType('id')"
+        ></button>
+      </div>
+      <button 
+        pButton 
+        type="button" 
+        label="Add Team Member" 
+        icon="pi pi-plus" 
+        class="new-emp-button" 
+        (click)="navigateToAddEmployee()"
+      ></button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading team members...</span>
+    </div>
+
+    <p-table 
+      [value]="filteredEmployees" 
+      [tableStyle]="{ 'width': '100%' }"
+      [paginator]="true" 
+      [rows]="10" 
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} team members"
+      [rowsPerPageOptions]="[5, 10, 25, 50]"
+      styleClass="employee-table"
+      [sortField]="'id'"
+      [sortOrder]="1"
+      *ngIf="!isLoading"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Tasks</th>
+          <th class="margin">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-employee>
+        <tr>
+          <td>{{employee.id}}</td>
+          <td>
+            <div class="employee-name">
+              <span class="employee-avatar">{{getInitials(employee)}}</span>
+              <span>{{getFullName(employee)}}</span>
+            </div>
+          </td>
+          <td>{{employee.email}}</td>
+          <td>{{getRoleName(employee.role_Id)}}</td>
+          <td>
+            <button 
+              pButton 
+              type="button" 
+              icon="pi pi-plus" 
+              class="p-button-rounded p-button-text add-task-button"
+              (click)="openTaskCreationForm(employee)"
+              pTooltip="Add Task"
+            ></button>
+          </td>
+          <td>
+            <button 
+              pButton 
+              type="button" 
+              label="Remove" 
+              class="p-button-text remove-button"
+              (click)="confirmDelete(employee, $event)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">No team members found matching your search criteria</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

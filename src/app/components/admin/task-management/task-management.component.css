@@ -1,0 +1,123 @@
+.task-management-container {
+  padding: 2.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.header h2 {
+  color: #2c3e50;
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 2rem;
+  padding: 1.5rem;
+}
+
+.team-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.team-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.team-content {
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+}
+
+.task-stats {
+  width: 140px;
+  height: 140px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.total-tasks {
+  font-size: 3.5rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.task-label {
+  font-size: 1.1rem;
+  margin-top: 0.75rem;
+}
+
+.team-info {
+  flex-grow: 1;
+}
+
+.team-info h3 {
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.task-details {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.task-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.task-stat span {
+  display: block;
+}
+
+.task-stat .completed {
+  color: #4CAF50;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.task-stat .pending {
+  color: #FF5722;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.task-stat .label {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.progress {
+  height: 100%;
+  background-color: #4CAF50;
+  transition: width 0.3s ease;
+} 

@@ -1,0 +1,99 @@
+<div class="tasks-container">
+  <div class="tasks-header">
+    <div class="header-content">
+      <h1>My Tasks</h1>
+      <p class="subtitle">Manage and track your assigned tasks</p>
+    </div>
+    <button pButton 
+            type="button" 
+            label="New Task" 
+            icon="pi pi-plus" 
+            class="p-button-primary"
+            (click)="createNewTask()">
+    </button>
+  </div>
+
+  <p-card>
+    <p-table [value]="tasks" [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tasks"
+             [rowsPerPageOptions]="[10,25,50]">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Title</th>
+          <th>Due Date</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Assigned By</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-task>
+        <tr>
+          <td>{{ task.title }}</td>
+          <td>{{ task.dueDate | date }}</td>
+          <td>
+            <p-tag [severity]="getPrioritySeverity(task.priority)" [value]="task.priority"></p-tag>
+          </td>
+          <td>
+            <p-dropdown [options]="statusOptions" 
+                       [(ngModel)]="task.status"
+                       (onChange)="updateTaskStatus(task, $event.value)"
+                       [style]="{'width':'100%'}"
+                       [showClear]="false">
+            </p-dropdown>
+          </td>
+          <td>{{ task.assignedBy }}</td>
+          <td>
+            <button pButton 
+                    icon="pi pi-eye" 
+                    class="p-button-rounded p-button-text"
+                    (click)="viewTaskDetails(task)">
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Task Details Dialog -->
+  <p-dialog [(visible)]="showTaskDialog" 
+            [style]="{width: '450px'}" 
+            header="Task Details"
+            [modal]="true"
+            [draggable]="false"
+            [resizable]="false">
+    <div class="task-details" *ngIf="selectedTask">
+      <div class="detail-item">
+        <label>Title:</label>
+        <span>{{ selectedTask.title }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Description:</label>
+        <p>{{ selectedTask.description }}</p>
+      </div>
+      <div class="detail-item">
+        <label>Due Date:</label>
+        <span>{{ selectedTask.dueDate | date }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Priority:</label>
+        <p-tag [severity]="getPrioritySeverity(selectedTask.priority)" 
+               [value]="selectedTask.priority">
+        </p-tag>
+      </div>
+      <div class="detail-item">
+        <label>Status:</label>
+        <p-dropdown [options]="statusOptions" 
+                   [(ngModel)]="selectedTask.status"
+                   (onChange)="updateTaskStatus(selectedTask, $event.value)"
+                   [style]="{'width':'100%'}"
+                   [showClear]="false">
+        </p-dropdown>
+      </div>
+      <div class="detail-item">
+        <label>Assigned By:</label>
+        <span>{{ selectedTask.assignedBy }}</span>
+      </div>
+    </div>
+  </p-dialog>
+</div> 

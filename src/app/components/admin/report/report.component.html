@@ -1,0 +1,1172 @@
+<!-- <div class="report-container">
+  <div class="nav-tabs">
+    <button [class.active]="activeTab === 'generate'" (click)="activeTab = 'generate'">
+      <i class="pi pi-file-edit"></i>
+      Generate Report
+    </button>
+    <button [class.active]="activeTab === 'view'" (click)="activeTab = 'view'">
+      <i class="pi pi-list"></i>
+      View Reports
+    </button>
+    <button [class.active]="activeTab === 'export'" (click)="activeTab = 'export'">
+      <i class="pi pi-download"></i>
+      Export Reports
+    </button>
+  </div>
+
+  <div *ngIf="activeTab === 'generate'" class="section-content">
+    <div class="section-header">
+      <h2>Generate New Report</h2>
+      <button pButton label="Create Report" icon="pi pi-plus" (click)="showGenerateDialog = true"></button>
+    </div>
+    <p-card>
+      <div class="generate-info">
+        <i class="pi pi-info-circle"></i>
+        <p>Create custom reports by selecting the report type, date range, and department. Task and Performance reports will automatically fetch real-time data from your teams.</p>
+      </div>
+    </p-card>
+  </div>
+
+  <div *ngIf="activeTab === 'view'" class="section-content">
+    <div class="section-header">
+      <h2>View Reports</h2>
+      <div class="header-actions">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input type="text" pInputText placeholder="Search reports..." />
+        </span>
+      </div>
+    </div>
+    <p-table [value]="reports" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Department</th>
+          <th>Date Range</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-report>
+        <tr>
+          <td>{{report.title}}</td>
+          <td>
+            <span class="category-badge" [ngClass]="'category-' + report.category.toLowerCase()">
+              {{report.category}}
+            </span>
+          </td>
+          <td>{{report.team || 'All Departments'}}</td>
+          <td>{{report.dateRange.start | date:'mediumDate'}} - {{report.dateRange.end | date:'mediumDate'}}</td>
+          <td>
+            <span class="status-badge" [style.background-color]="getStatusColor(report.status)">
+              {{report.status}}
+            </span>
+          </td>
+          <td>{{report.createdAt | date:'medium'}}</td>
+          <td>
+            <div class="action-buttons">
+              <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                      (click)="viewReport(report)" pTooltip="View Report"></button>
+              <button pButton icon="pi pi-download" class="p-button-rounded p-button-text" 
+                      (click)="downloadReport(report, 'pdf')" pTooltip="Download PDF"
+                      [disabled]="report.status !== 'generated'"></button>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" 
+                      (click)="deleteReport(report)" pTooltip="Delete Report"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div *ngIf="activeTab === 'export'" class="section-content">
+    <div class="section-header">
+      <h2>Export Reports</h2>
+    </div>
+    <p-card>
+      <div class="export-options">
+        <div class="field">
+          <label for="format">Export Format</label>
+          <p-dropdown id="format" [options]="exportFormats" [(ngModel)]="selectedFormat" 
+                      optionLabel="label" optionValue="value"></p-dropdown>
+        </div>
+        <div class="field">
+          <label>Select Reports</label>
+          <p-table [value]="reports" [(selection)]="selectedReports" dataKey="id" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3rem">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Department</th>
+                <th>Created</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-report>
+              <tr>
+                <td>
+                  <p-tableCheckbox [value]="report" [disabled]="report.status !== 'generated'"></p-tableCheckbox>
+                </td>
+                <td>{{report.title}}</td>
+                <td>{{report.category}}</td>
+                <td>{{report.team || 'All Departments'}}</td>
+                <td>{{report.createdAt | date:'medium'}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="export-actions">
+          <button pButton label="Export Selected" icon="pi pi-download" 
+                  (click)="exportSelectedReports()" [disabled]="selectedReports.length === 0"></button>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>
+
+<p-dialog header="Generate New Report" [(visible)]="showGenerateDialog" [style]="{width: '500px'}" [modal]="true">
+  <div class="dialog-content">
+    <div class="field">
+      <label for="title">Report Title *</label>
+      <input id="title" type="text" pInputText [(ngModel)]="newReport.title" 
+             placeholder="Enter report title" class="w-full">
+    </div>
+    
+    <div class="field-row">
+      <div class="field">
+        <label for="category">Category *</label>
+        <p-dropdown id="category" [options]="categories" [(ngModel)]="newReport.category" 
+                    optionLabel="label" optionValue="value" placeholder="Select category" class="w-full"></p-dropdown>
+      </div>
+      
+      <div class="field" *ngIf="isTaskCategory()">
+        <label for="department">Department *</label>
+        <p-dropdown id="department" [options]="departments" [(ngModel)]="newReport.departmentId" 
+                    optionLabel="label" optionValue="value" placeholder="Select Department" class="w-full"></p-dropdown>
+      </div>
+
+      <div class="field" *ngIf="isPerformanceCategory()">
+        <label for="department">Department (Optional)</label>
+        <p-dropdown id="department" [options]="departments" [(ngModel)]="newReport.departmentId" 
+                    optionLabel="label" optionValue="value" placeholder="All Departments" class="w-full"></p-dropdown>
+      </div>
+    </div>
+    
+    <div class="field-row">
+      <div class="field">
+        <label for="startDate">Start Date</label>
+        <p-calendar id="startDate" [(ngModel)]="newReport.dateRange.start" 
+                    [showIcon]="true" dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+      </div>
+      <div class="field">
+        <label for="endDate">End Date</label>
+        <p-calendar id="endDate" [(ngModel)]="newReport.dateRange.end" 
+                    [showIcon]="true" dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+      </div>
+    </div>
+
+    <div class="info-message" *ngIf="isTaskCategory()">
+      <i class="pi pi-info-circle"></i>
+      <span>Task reports will fetch real-time data including task counts, priorities, and team metrics for the selected department.</span>
+    </div>
+
+    <div class="info-message" *ngIf="isPerformanceCategory()">
+      <i class="pi pi-info-circle"></i>
+      <span>Performance reports will analyze task completion rates, team efficiency, and productivity metrics. Leave department blank for organization-wide analysis.</span>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" (click)="showGenerateDialog = false" 
+            class="p-button-text" [disabled]="isGeneratingReport"></button>
+    <button pButton label="Generate" icon="pi pi-check" (click)="generateReport()" 
+            [disabled]="!newReport.title || !newReport.category || (isTaskCategory() && !newReport.departmentId) || isGeneratingReport"
+            [loading]="isGeneratingReport"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Report Details" [(visible)]="showViewDialog" [style]="{width: '1200px'}" [modal]="true" 
+          *ngIf="selectedReport" [maximizable]="true">
+  <div class="report-details">
+    <div class="report-header">
+      <div class="report-title-section">
+        <h3>{{selectedReport.title}}</h3>
+        <span class="category-badge" [ngClass]="'category-' + selectedReport.category.toLowerCase()">
+          {{selectedReport.category}}
+        </span>
+      </div>
+      <span class="status-badge" [style.background-color]="getStatusColor(selectedReport.status)">
+        {{selectedReport.status}}
+      </span>
+    </div>
+
+    <div class="report-info">
+      <div class="info-item">
+        <label>Department:</label>
+        <span>{{selectedReport.team || 'All Departments'}}</span>
+      </div>
+      <div class="info-item">
+        <label>Date Range:</label>
+        <span>{{selectedReport.dateRange.start | date:'mediumDate'}} - {{selectedReport.dateRange.end | date:'mediumDate'}}</span>
+      </div>
+      <div class="info-item">
+        <label>Created:</label>
+        <span>{{selectedReport.createdAt | date:'medium'}}</span>
+      </div>
+    </div>
+
+    <div class="report-content" *ngIf="(selectedReport.category === 'Tasks' || selectedReport.category === 'Performance') && selectedReport.reportData">
+      <div class="task-report-dashboard">
+        <div class="summary-cards">
+          <div class="summary-card completion-card">
+            <div class="card-header">
+              <h4>Task Completion</h4>
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric" 
+                   [style.color]="selectedReport.reportData.departmentInfo.color">
+                {{selectedReport.reportData.completionPercentage}}%
+              </div>
+              <div class="metric-subtitle">
+                {{selectedReport.reportData.taskStats.completed}} of {{selectedReport.reportData.taskStats.total}} tasks completed
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-card team-card">
+            <div class="card-header">
+              <h4>Team Members</h4>
+              <i class="pi pi-users"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric">{{selectedReport.reportData.memberCount}}</div>
+              <div class="metric-subtitle">Active team members</div>
+            </div>
+          </div>
+
+          <div class="summary-card productivity-card">
+            <div class="card-header">
+              <h4>Productivity Score</h4>
+              <i class="pi pi-chart-line"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric">{{selectedReport.reportData.teamMetrics.productivity}}%</div>
+              <div class="metric-subtitle">Overall team performance</div>
+            </div>
+          </div>
+
+          <div class="summary-card efficiency-card">
+            <div class="card-header">
+              <h4>Efficiency Rate</h4>
+              <i class="pi pi-gauge"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric">{{selectedReport.reportData.teamMetrics.efficiency}}%</div>
+              <div class="metric-subtitle">Task completion efficiency</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-section">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Task Status Overview</h4>
+              <p>Current distribution of tasks by status</p>
+            </div>
+            <p-chart type="doughnut" [data]="taskCompletionChartData" [options]="chartOptions" 
+                     width="400" height="300"></p-chart>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Priority Analysis</h4>
+              <p>Task distribution by priority level</p>
+            </div>
+            <p-chart type="bar" [data]="priorityChartData" [options]="chartOptions" 
+                     width="400" height="300"></p-chart>
+          </div>
+
+          <div class="chart-container full-width" *ngIf="selectedReport.category === 'Performance'">
+            <div class="chart-header">
+              <h4>Performance Trends</h4>
+              <p>Team performance metrics comparison</p>
+            </div>
+            <p-chart type="radar" [data]="performanceChartData" [options]="chartOptions" 
+                     width="600" height="400"></p-chart>
+          </div>
+
+          <div class="chart-container full-width" *ngIf="selectedReport.category === 'Performance'">
+            <div class="chart-header">
+              <h4>Task Volume Analysis</h4>
+              <p>Task distribution across different statuses</p>
+            </div>
+            <p-chart type="line" [data]="teamComparisonChartData" [options]="chartOptions" 
+                     width="600" height="300"></p-chart>
+          </div>
+        </div>
+
+        <div class="analytics-section">
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <h4>Task Breakdown</h4>
+              <div class="stats-list">
+                <div class="stat-row">
+                  <span class="stat-icon" style="background-color: #10B981;">
+                    <i class="pi pi-check"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">Completed Tasks</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.completed}}</span>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon" style="background-color: #3B82F6;">
+                    <i class="pi pi-clock"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">In Progress</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.inProgress}}</span>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon" style="background-color: #F59E0B;">
+                    <i class="pi pi-pause"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">Pending Tasks</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.pending}}</span>
+                  </div>
+                </div>
+                <div class="stat-row" *ngIf="selectedReport.reportData.taskStats.overdue > 0">
+                  <span class="stat-icon" style="background-color: #EF4444;">
+                    <i class="pi pi-exclamation-triangle"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">Overdue Tasks</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.overdue}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="analytics-card">
+              <h4>Priority Distribution</h4>
+              <div class="priority-breakdown">
+                <div class="priority-item">
+                  <div class="priority-bar">
+                    <div class="priority-fill high-priority" 
+                         [style.width.%]="(selectedReport.reportData.priorityStats.high / (selectedReport.reportData.priorityStats.high + selectedReport.reportData.priorityStats.medium + selectedReport.reportData.priorityStats.low)) * 100">
+                    </div>
+                  </div>
+                  <div class="priority-details">
+                    <span class="priority-label">High Priority</span>
+                    <span class="priority-count">{{selectedReport.reportData.priorityStats.high}} tasks</span>
+                  </div>
+                </div>
+                <div class="priority-item">
+                  <div class="priority-bar">
+                    <div class="priority-fill medium-priority" 
+                         [style.width.%]="(selectedReport.reportData.priorityStats.medium / (selectedReport.reportData.priorityStats.high + selectedReport.reportData.priorityStats.medium + selectedReport.reportData.priorityStats.low)) * 100">
+                    </div>
+                  </div>
+                  <div class="priority-details">
+                    <span class="priority-label">Medium Priority</span>
+                    <span class="priority-count">{{selectedReport.reportData.priorityStats.medium}} tasks</span>
+                  </div>
+                </div>
+                <div class="priority-item">
+                  <div class="priority-bar">
+                    <div class="priority-fill low-priority" 
+                         [style.width.%]="(selectedReport.reportData.priorityStats.low / (selectedReport.reportData.priorityStats.high + selectedReport.reportData.priorityStats.medium + selectedReport.reportData.priorityStats.low)) * 100">
+                    </div>
+                  </div>
+                  <div class="priority-details">
+                    <span class="priority-label">Low Priority</span>
+                    <span class="priority-count">{{selectedReport.reportData.priorityStats.low}} tasks</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="analytics-card">
+              <h4>Key Performance Indicators</h4>
+              <div class="kpi-grid">
+                <div class="kpi-item">
+                  <div class="kpi-value" [style.color]="selectedReport.reportData.teamMetrics.productivity >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.productivity >= 60 ? '#F59E0B' : '#EF4444'">
+                    {{selectedReport.reportData.teamMetrics.productivity}}%
+                  </div>
+                  <div class="kpi-label">Productivity</div>
+                  <div class="kpi-indicator">
+                    <div class="kpi-bar">
+                      <div class="kpi-fill" [style.width.%]="selectedReport.reportData.teamMetrics.productivity" 
+                           [style.background-color]="selectedReport.reportData.teamMetrics.productivity >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.productivity >= 60 ? '#F59E0B' : '#EF4444'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="kpi-item">
+                  <div class="kpi-value" [style.color]="selectedReport.reportData.teamMetrics.efficiency >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.efficiency >= 60 ? '#F59E0B' : '#EF4444'">
+                    {{selectedReport.reportData.teamMetrics.efficiency}}%
+                  </div>
+                  <div class="kpi-label">Efficiency</div>
+                  <div class="kpi-indicator">
+                    <div class="kpi-bar">
+                      <div class="kpi-fill" [style.width.%]="selectedReport.reportData.teamMetrics.efficiency"
+                           [style.background-color]="selectedReport.reportData.teamMetrics.efficiency >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.efficiency >= 60 ? '#F59E0B' : '#EF4444'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="kpi-item">
+                  <div class="kpi-value" [style.color]="selectedReport.reportData.teamMetrics.onTimeDelivery >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.onTimeDelivery >= 60 ? '#F59E0B' : '#EF4444'">
+                    {{selectedReport.reportData.teamMetrics.onTimeDelivery}}%
+                  </div>
+                  <div class="kpi-label">On-Time Delivery</div>
+                  <div class="kpi-indicator">
+                    <div class="kpi-bar">
+                      <div class="kpi-fill" [style.width.%]="selectedReport.reportData.teamMetrics.onTimeDelivery"
+                           [style.background-color]="selectedReport.reportData.teamMetrics.onTimeDelivery >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.onTimeDelivery >= 60 ? '#F59E0B' : '#EF4444'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="insights-section">
+          <h4>Key Insights & Recommendations</h4>
+          <div class="insights-list">
+            <div class="insight-item success" *ngIf="selectedReport.reportData.completionPercentage >= 80">
+              <i class="pi pi-check-circle"></i>
+              <div class="insight-content">
+                <strong>Excellent Performance:</strong> The team is exceeding expectations with {{selectedReport.reportData.completionPercentage}}% completion rate.
+              </div>
+            </div>
+            <div class="insight-item warning" *ngIf="selectedReport.reportData.completionPercentage < 60">
+              <i class="pi pi-exclamation-triangle"></i>
+              <div class="insight-content">
+                <strong>Attention Needed:</strong> Completion rate is below optimal. Consider reviewing task priorities and resource allocation.
+              </div>
+            </div>
+            <div class="insight-item danger" *ngIf="selectedReport.reportData.taskStats.overdue > 0">
+              <i class="pi pi-clock"></i>
+              <div class="insight-content">
+                <strong>Overdue Tasks:</strong> {{selectedReport.reportData.taskStats.overdue}} tasks require immediate attention to prevent further delays.
+              </div>
+            </div>
+            <div class="insight-item info" *ngIf="selectedReport.reportData.priorityStats.high > selectedReport.reportData.taskStats.completed">
+              <i class="pi pi-info-circle"></i>
+              <div class="insight-content">
+                <strong>Priority Balance:</strong> High number of high-priority tasks detected. Consider workload redistribution for better balance.
+              </div>
+            </div>
+            <div class="insight-item success" *ngIf="selectedReport.reportData.teamMetrics.efficiency >= 85">
+              <i class="pi pi-thumbs-up"></i>
+              <div class="insight-content">
+                <strong>High Efficiency:</strong> Team is operating at {{selectedReport.reportData.teamMetrics.efficiency}}% efficiency - excellent workflow management.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-content" *ngIf="(selectedReport.category !== 'Tasks' && selectedReport.category !== 'Performance') || !selectedReport.reportData">
+      <div class="generic-report-content">
+        <div class="report-placeholder">
+          <div class="placeholder-icon">
+            <i class="pi pi-chart-bar" style="font-size: 4rem; color: #cbd5e1;"></i>
+          </div>
+          <h4>Report Visualization</h4>
+          <p>Detailed {{selectedReport.category}} report visualization and analytics will be displayed here based on the selected category and available data.</p>
+          <div class="basic-report-info">
+            <div class="info-grid">
+              <div class="info-card">
+                <label>Report Type:</label>
+                <span>{{selectedReport.category}}</span>
+              </div>
+              <div class="info-card">
+                <label>Department:</label>
+                <span>{{selectedReport.team || 'All Departments'}}</span>
+              </div>
+              <div class="info-card">
+                <label>Period:</label>
+                <span>{{selectedReport.dateRange.start | date:'mediumDate'}} - {{selectedReport.dateRange.end | date:'mediumDate'}}</span>
+              </div>
+              <div class="info-card">
+                <label>Status:</label>
+                <span class="status-badge" [style.background-color]="getStatusColor(selectedReport.status)">
+                  {{selectedReport.status}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-actions">
+      <div class="action-group">
+        <button pButton label="Download PDF" icon="pi pi-file-pdf" 
+                (click)="downloadReport(selectedReport, 'pdf')" 
+                [disabled]="selectedReport.status !== 'generated'"
+                class="p-button-outlined"></button>
+        <button pButton label="Download Excel" icon="pi pi-file-excel" 
+                (click)="downloadReport(selectedReport, 'excel')" 
+                [disabled]="selectedReport.status !== 'generated'"
+                class="p-button-outlined"></button>
+        <button pButton label="Download CSV" icon="pi pi-file" 
+                (click)="downloadReport(selectedReport, 'csv')" 
+                [disabled]="selectedReport.status !== 'generated'"
+                class="p-button-outlined"></button>
+      </div>
+      <div class="action-group">
+        <button pButton label="Close" icon="pi pi-times" 
+                (click)="showViewDialog = false" 
+                class="p-button-text"></button>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast> -->
+
+
+
+<div class="report-container">
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs">
+    <button [class.active]="activeTab === 'generate'" (click)="activeTab = 'generate'">
+      <i class="pi pi-file-edit"></i>
+      Generate Report
+    </button>
+    <button [class.active]="activeTab === 'view'" (click)="activeTab = 'view'">
+      <i class="pi pi-list"></i>
+      View Reports
+    </button>
+    <button [class.active]="activeTab === 'export'" (click)="activeTab = 'export'">
+      <i class="pi pi-download"></i>
+      Export Reports
+    </button>
+  </div>
+
+  <!-- Generate Report Section -->
+  <div *ngIf="activeTab === 'generate'" class="section-content">
+    <div class="section-header">
+      <h2>Generate New Report</h2>
+      <button pButton label="Create Report" icon="pi pi-plus" (click)="showGenerateDialog = true"></button>
+    </div>
+    <p-card>
+      <div class="generate-info">
+        <i class="pi pi-info-circle"></i>
+        <p>Create custom reports by selecting the report type, date range, and department. Task and Performance reports will automatically fetch real-time data from your teams.</p>
+        <div class="storage-info">
+          <i class="pi pi-database"></i>
+          <small>Generated reports are automatically saved locally and will persist across browser sessions.</small>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- View Reports Section -->
+  <div *ngIf="activeTab === 'view'" class="section-content">
+    <div class="section-header">
+      <h2>View Reports</h2>
+      <div class="header-actions">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input type="text" pInputText placeholder="Search reports..." />
+        </span>
+        <div class="storage-indicator">
+          <i class="pi pi-save"></i>
+          <small>{{reports.length}} reports stored locally</small>
+        </div>
+      </div>
+    </div>
+    <p-table [value]="reports" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Department</th>
+          <th>Date Range</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-report>
+        <tr>
+          <td>{{report.title}}</td>
+          <td>
+            <span class="category-badge" [ngClass]="'category-' + report.category.toLowerCase()">
+              {{report.category}}
+            </span>
+          </td>
+          <td>{{report.team || 'All Departments'}}</td>
+          <td>{{report.dateRange.start | date:'mediumDate'}} - {{report.dateRange.end | date:'mediumDate'}}</td>
+          <td>
+            <span class="status-badge" [style.background-color]="getStatusColor(report.status)">
+              {{report.status}}
+            </span>
+          </td>
+          <td>{{report.createdAt | date:'medium'}}</td>
+          <td>
+            <div class="action-buttons">
+              <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                      (click)="viewReport(report)" pTooltip="View Report"></button>
+              <button pButton icon="pi pi-file-pdf" class="p-button-rounded p-button-text" 
+                      (click)="downloadReport(report, 'pdf')" pTooltip="Download PDF"
+                      [disabled]="report.status !== 'generated'"></button>
+              <button pButton icon="pi pi-file-excel" class="p-button-rounded p-button-text" 
+                      (click)="downloadReport(report, 'excel')" pTooltip="Download Excel"
+                      [disabled]="report.status !== 'generated'"></button>
+              <button pButton icon="pi pi-file" class="p-button-rounded p-button-text" 
+                      (click)="downloadReport(report, 'csv')" pTooltip="Download CSV"
+                      [disabled]="report.status !== 'generated'"></button>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" 
+                      (click)="deleteReport(report)" pTooltip="Delete Report"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Export Reports Section -->
+  <div *ngIf="activeTab === 'export'" class="section-content">
+    <div class="section-header">
+      <h2>Export Reports</h2>
+    </div>
+    <p-card>
+      <div class="export-options">
+        <div class="field">
+          <label for="format">Export Format</label>
+          <p-dropdown id="format" [options]="exportFormats" [(ngModel)]="selectedFormat" 
+                      optionLabel="label" optionValue="value"></p-dropdown>
+        </div>
+        <div class="export-info">
+          <div class="format-descriptions">
+            <div class="format-desc" *ngIf="selectedFormat === 'pdf'">
+              <i class="pi pi-file-pdf"></i>
+              <span>PDF format exports as HTML file with structured layout and styling</span>
+            </div>
+            <div class="format-desc" *ngIf="selectedFormat === 'excel'">
+              <i class="pi pi-file-excel"></i>
+              <span>Excel format exports as XLS file with detailed sections and data</span>
+            </div>
+            <div class="format-desc" *ngIf="selectedFormat === 'csv'">
+              <i class="pi pi-file"></i>
+              <span>CSV format exports tabular data suitable for spreadsheets</span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Select Reports</label>
+          <p-table [value]="reports" [(selection)]="selectedReports" dataKey="id" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3rem">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Department</th>
+                <th>Created</th>
+                <th>Data Available</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-report>
+              <tr>
+                <td>
+                  <p-tableCheckbox [value]="report" [disabled]="report.status !== 'generated'"></p-tableCheckbox>
+                </td>
+                <td>{{report.title}}</td>
+                <td>{{report.category}}</td>
+                <td>{{report.team || 'All Departments'}}</td>
+                <td>{{report.createdAt | date:'medium'}}</td>
+                <td>
+                  <span class="data-indicator" [class.has-data]="report.reportData">
+                    <i class="pi" [ngClass]="report.reportData ? 'pi-check-circle' : 'pi-minus-circle'"></i>
+                    {{report.reportData ? 'Rich Data' : 'Basic Info'}}
+                  </span>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="export-actions">
+          <button pButton label="Export Selected" icon="pi pi-download" 
+                  (click)="exportSelectedReports()" [disabled]="selectedReports.length === 0"
+                  [class]="'p-button-' + selectedFormat"></button>
+          <div class="export-summary" *ngIf="selectedReports.length > 0">
+            <small>{{selectedReports.length}} report(s) selected for {{selectedFormat.toUpperCase()}} export</small>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>
+
+<!-- Generate Report Dialog -->
+<p-dialog header="Generate New Report" [(visible)]="showGenerateDialog" [style]="{width: '500px'}" [modal]="true">
+  <div class="dialog-content">
+    <div class="field">
+      <label for="title">Report Title *</label>
+      <input id="title" type="text" pInputText [(ngModel)]="newReport.title" 
+             placeholder="Enter report title" class="w-full">
+    </div>
+    
+    <div class="field-row">
+      <div class="field">
+        <label for="category">Category *</label>
+        <p-dropdown id="category" [options]="categories" [(ngModel)]="newReport.category" 
+                    optionLabel="label" optionValue="value" placeholder="Select category" class="w-full"></p-dropdown>
+      </div>
+      
+      <div class="field" *ngIf="isTaskCategory()">
+        <label for="department">Department *</label>
+        <p-dropdown id="department" [options]="departments" [(ngModel)]="newReport.departmentId" 
+                    optionLabel="label" optionValue="value" placeholder="Select Department" class="w-full"></p-dropdown>
+      </div>
+
+      <div class="field" *ngIf="isPerformanceCategory()">
+        <label for="department">Department (Optional)</label>
+        <p-dropdown id="department" [options]="departments" [(ngModel)]="newReport.departmentId" 
+                    optionLabel="label" optionValue="value" placeholder="All Departments" class="w-full"></p-dropdown>
+      </div>
+    </div>
+    
+    <div class="field-row">
+      <div class="field">
+        <label for="startDate">Start Date</label>
+        <p-calendar id="startDate" [(ngModel)]="newReport.dateRange.start" 
+                    [showIcon]="true" dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+      </div>
+      <div class="field">
+        <label for="endDate">End Date</label>
+        <p-calendar id="endDate" [(ngModel)]="newReport.dateRange.end" 
+                    [showIcon]="true" dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+      </div>
+    </div>
+
+    <div class="info-message" *ngIf="isTaskCategory()">
+      <i class="pi pi-info-circle"></i>
+      <span>Task reports will fetch real-time data including task counts, priorities, and team metrics for the selected department. Report will be saved locally for future access.</span>
+    </div>
+
+    <div class="info-message" *ngIf="isPerformanceCategory()">
+      <i class="pi pi-info-circle"></i>
+      <span>Performance reports will analyze task completion rates, team efficiency, and productivity metrics. Leave department blank for organization-wide analysis. Report will be saved locally for future access.</span>
+    </div>
+
+    <div class="storage-notice">
+      <i class="pi pi-save"></i>
+      <small>Generated reports are automatically saved in your browser's local storage and will be available across sessions.</small>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" (click)="showGenerateDialog = false" 
+            class="p-button-text" [disabled]="isGeneratingReport"></button>
+    <button pButton label="Generate & Save" icon="pi pi-check" (click)="generateReport()" 
+            [disabled]="!newReport.title || !newReport.category || (isTaskCategory() && !newReport.departmentId) || isGeneratingReport"
+            [loading]="isGeneratingReport"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Enhanced View Report Dialog -->
+<p-dialog header="Report Details" [(visible)]="showViewDialog" [style]="{width: '1200px'}" [modal]="true" 
+          *ngIf="selectedReport" [maximizable]="true">
+  <div class="report-details">
+    <!-- Report Header -->
+    <div class="report-header">
+      <div class="report-title-section">
+        <h3>{{selectedReport.title}}</h3>
+        <span class="category-badge" [ngClass]="'category-' + selectedReport.category.toLowerCase()">
+          {{selectedReport.category}}
+        </span>
+      </div>
+      <div class="header-indicators">
+        <span class="status-badge" [style.background-color]="getStatusColor(selectedReport.status)">
+          {{selectedReport.status}}
+        </span>
+        <span class="storage-badge">
+          <i class="pi pi-save"></i>
+          Saved Locally
+        </span>
+      </div>
+    </div>
+
+    <!-- Report Basic Info -->
+    <div class="report-info">
+      <div class="info-item">
+        <label>Department:</label>
+        <span>{{selectedReport.team || 'All Departments'}}</span>
+      </div>
+      <div class="info-item">
+        <label>Date Range:</label>
+        <span>{{selectedReport.dateRange.start | date:'mediumDate'}} - {{selectedReport.dateRange.end | date:'mediumDate'}}</span>
+      </div>
+      <div class="info-item">
+        <label>Created:</label>
+        <span>{{selectedReport.createdAt | date:'medium'}}</span>
+      </div>
+      <div class="info-item">
+        <label>Data Type:</label>
+        <span class="data-type-indicator" [class.rich-data]="selectedReport.reportData">
+          <i class="pi" [ngClass]="selectedReport.reportData ? 'pi-chart-bar' : 'pi-file'"></i>
+          {{selectedReport.reportData ? 'Rich Analytics Data' : 'Basic Report Info'}}
+        </span>
+      </div>
+    </div>
+
+    <!-- Task/Performance Report Content -->
+    <div class="report-content" *ngIf="(selectedReport.category === 'Tasks' || selectedReport.category === 'Performance') && selectedReport.reportData">
+      <div class="task-report-dashboard">
+        <!-- Executive Summary Cards -->
+        <div class="summary-cards">
+          <div class="summary-card completion-card">
+            <div class="card-header">
+              <h4>Task Completion</h4>
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric" 
+                   [style.color]="selectedReport.reportData.departmentInfo.color">
+                {{selectedReport.reportData.completionPercentage}}%
+              </div>
+              <div class="metric-subtitle">
+                {{selectedReport.reportData.taskStats.completed}} of {{selectedReport.reportData.taskStats.total}} tasks completed
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-card team-card">
+            <div class="card-header">
+              <h4>Team Members</h4>
+              <i class="pi pi-users"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric">{{selectedReport.reportData.memberCount}}</div>
+              <div class="metric-subtitle">Active team members</div>
+            </div>
+          </div>
+
+          <div class="summary-card productivity-card">
+            <div class="card-header">
+              <h4>Productivity Score</h4>
+              <i class="pi pi-chart-line"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric">{{selectedReport.reportData.teamMetrics.productivity}}%</div>
+              <div class="metric-subtitle">Overall team performance</div>
+            </div>
+          </div>
+
+          <div class="summary-card efficiency-card">
+            <div class="card-header">
+              <h4>Efficiency Rate</h4>
+              <i class="pi pi-gauge"></i>
+            </div>
+            <div class="card-content">
+              <div class="main-metric">{{selectedReport.reportData.teamMetrics.efficiency}}%</div>
+              <div class="metric-subtitle">Task completion efficiency</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Task Status Overview</h4>
+              <p>Current distribution of tasks by status</p>
+            </div>
+            <p-chart type="doughnut" [data]="taskCompletionChartData" [options]="chartOptions" 
+                     width="400" height="300"></p-chart>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Priority Analysis</h4>
+              <p>Task distribution by priority level</p>
+            </div>
+            <p-chart type="bar" [data]="priorityChartData" [options]="chartOptions" 
+                     width="400" height="300"></p-chart>
+          </div>
+
+          <div class="chart-container full-width" *ngIf="selectedReport.category === 'Performance'">
+            <div class="chart-header">
+              <h4>Performance Trends</h4>
+              <p>Team performance metrics comparison</p>
+            </div>
+            <p-chart type="radar" [data]="performanceChartData" [options]="chartOptions" 
+                     width="600" height="400"></p-chart>
+          </div>
+
+          <div class="chart-container full-width" *ngIf="selectedReport.category === 'Performance'">
+            <div class="chart-header">
+              <h4>Task Volume Analysis</h4>
+              <p>Task distribution across different statuses</p>
+            </div>
+            <p-chart type="line" [data]="teamComparisonChartData" [options]="chartOptions" 
+                     width="600" height="300"></p-chart>
+          </div>
+        </div>
+
+        <!-- Detailed Analytics -->
+        <div class="analytics-section">
+          <div class="analytics-grid">
+            <!-- Task Statistics -->
+            <div class="analytics-card">
+              <h4>Task Breakdown</h4>
+              <div class="stats-list">
+                <div class="stat-row">
+                  <span class="stat-icon" style="background-color: #10B981;">
+                    <i class="pi pi-check"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">Completed Tasks</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.completed}}</span>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon" style="background-color: #3B82F6;">
+                    <i class="pi pi-clock"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">In Progress</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.inProgress}}</span>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-icon" style="background-color: #F59E0B;">
+                    <i class="pi pi-pause"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">Pending Tasks</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.pending}}</span>
+                  </div>
+                </div>
+                <div class="stat-row" *ngIf="selectedReport.reportData.taskStats.overdue > 0">
+                  <span class="stat-icon" style="background-color: #EF4444;">
+                    <i class="pi pi-exclamation-triangle"></i>
+                  </span>
+                  <div class="stat-details">
+                    <span class="stat-label">Overdue Tasks</span>
+                    <span class="stat-value">{{selectedReport.reportData.taskStats.overdue}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Priority Analysis -->
+            <div class="analytics-card">
+              <h4>Priority Distribution</h4>
+              <div class="priority-breakdown">
+                <div class="priority-item">
+                  <div class="priority-bar">
+                    <div class="priority-fill high-priority" 
+                         [style.width.%]="(selectedReport.reportData.priorityStats.high / (selectedReport.reportData.priorityStats.high + selectedReport.reportData.priorityStats.medium + selectedReport.reportData.priorityStats.low)) * 100">
+                    </div>
+                  </div>
+                  <div class="priority-details">
+                    <span class="priority-label">High Priority</span>
+                    <span class="priority-count">{{selectedReport.reportData.priorityStats.high}} tasks</span>
+                  </div>
+                </div>
+                <div class="priority-item">
+                  <div class="priority-bar">
+                    <div class="priority-fill medium-priority" 
+                         [style.width.%]="(selectedReport.reportData.priorityStats.medium / (selectedReport.reportData.priorityStats.high + selectedReport.reportData.priorityStats.medium + selectedReport.reportData.priorityStats.low)) * 100">
+                    </div>
+                  </div>
+                  <div class="priority-details">
+                    <span class="priority-label">Medium Priority</span>
+                    <span class="priority-count">{{selectedReport.reportData.priorityStats.medium}} tasks</span>
+                  </div>
+                </div>
+                <div class="priority-item">
+                  <div class="priority-bar">
+                    <div class="priority-fill low-priority" 
+                         [style.width.%]="(selectedReport.reportData.priorityStats.low / (selectedReport.reportData.priorityStats.high + selectedReport.reportData.priorityStats.medium + selectedReport.reportData.priorityStats.low)) * 100">
+                    </div>
+                  </div>
+                  <div class="priority-details">
+                    <span class="priority-label">Low Priority</span>
+                    <span class="priority-count">{{selectedReport.reportData.priorityStats.low}} tasks</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="analytics-card">
+              <h4>Key Performance Indicators</h4>
+              <div class="kpi-grid">
+                <div class="kpi-item">
+                  <div class="kpi-value" [style.color]="selectedReport.reportData.teamMetrics.productivity >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.productivity >= 60 ? '#F59E0B' : '#EF4444'">
+                    {{selectedReport.reportData.teamMetrics.productivity}}%
+                  </div>
+                  <div class="kpi-label">Productivity</div>
+                  <div class="kpi-indicator">
+                    <div class="kpi-bar">
+                      <div class="kpi-fill" [style.width.%]="selectedReport.reportData.teamMetrics.productivity" 
+                           [style.background-color]="selectedReport.reportData.teamMetrics.productivity >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.productivity >= 60 ? '#F59E0B' : '#EF4444'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="kpi-item">
+                  <div class="kpi-value" [style.color]="selectedReport.reportData.teamMetrics.efficiency >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.efficiency >= 60 ? '#F59E0B' : '#EF4444'">
+                    {{selectedReport.reportData.teamMetrics.efficiency}}%
+                  </div>
+                  <div class="kpi-label">Efficiency</div>
+                  <div class="kpi-indicator">
+                    <div class="kpi-bar">
+                      <div class="kpi-fill" [style.width.%]="selectedReport.reportData.teamMetrics.efficiency"
+                           [style.background-color]="selectedReport.reportData.teamMetrics.efficiency >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.efficiency >= 60 ? '#F59E0B' : '#EF4444'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="kpi-item">
+                  <div class="kpi-value" [style.color]="selectedReport.reportData.teamMetrics.onTimeDelivery >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.onTimeDelivery >= 60 ? '#F59E0B' : '#EF4444'">
+                    {{selectedReport.reportData.teamMetrics.onTimeDelivery}}%
+                  </div>
+                  <div class="kpi-label">On-Time Delivery</div>
+                  <div class="kpi-indicator">
+                    <div class="kpi-bar">
+                      <div class="kpi-fill" [style.width.%]="selectedReport.reportData.teamMetrics.onTimeDelivery"
+                           [style.background-color]="selectedReport.reportData.teamMetrics.onTimeDelivery >= 80 ? '#10B981' : selectedReport.reportData.teamMetrics.onTimeDelivery >= 60 ? '#F59E0B' : '#EF4444'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Insights and Recommendations -->
+        <div class="insights-section">
+          <h4>Key Insights & Recommendations</h4>
+          <div class="insights-list">
+            <div class="insight-item success" *ngIf="selectedReport.reportData.completionPercentage >= 80">
+              <i class="pi pi-check-circle"></i>
+              <div class="insight-content">
+                <strong>Excellent Performance:</strong> The team is exceeding expectations with {{selectedReport.reportData.completionPercentage}}% completion rate.
+              </div>
+            </div>
+            <div class="insight-item warning" *ngIf="selectedReport.reportData.completionPercentage < 60">
+              <i class="pi pi-exclamation-triangle"></i>
+              <div class="insight-content">
+                <strong>Attention Needed:</strong> Completion rate is below optimal. Consider reviewing task priorities and resource allocation.
+              </div>
+            </div>
+            <div class="insight-item danger" *ngIf="selectedReport.reportData.taskStats.overdue > 0">
+              <i class="pi pi-clock"></i>
+              <div class="insight-content">
+                <strong>Overdue Tasks:</strong> {{selectedReport.reportData.taskStats.overdue}} tasks require immediate attention to prevent further delays.
+              </div>
+            </div>
+            <div class="insight-item info" *ngIf="selectedReport.reportData.priorityStats.high > selectedReport.reportData.taskStats.completed">
+              <i class="pi pi-info-circle"></i>
+              <div class="insight-content">
+                <strong>Priority Balance:</strong> High number of high-priority tasks detected. Consider workload redistribution for better balance.
+              </div>
+            </div>
+            <div class="insight-item success" *ngIf="selectedReport.reportData.teamMetrics.efficiency >= 85">
+              <i class="pi pi-thumbs-up"></i>
+              <div class="insight-content">
+                <strong>High Efficiency:</strong> Team is operating at {{selectedReport.reportData.teamMetrics.efficiency}}% efficiency - excellent workflow management.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generic Report Content -->
+    <div class="report-content" *ngIf="(selectedReport.category !== 'Tasks' && selectedReport.category !== 'Performance') || !selectedReport.reportData">
+      <div class="generic-report-content">
+        <div class="report-placeholder">
+          <div class="placeholder-icon">
+            <i class="pi pi-chart-bar" style="font-size: 4rem; color: #cbd5e1;"></i>
+          </div>
+          <h4>Report Visualization</h4>
+          <p>Detailed {{selectedReport.category}} report visualization and analytics will be displayed here based on the selected category and available data.</p>
+          <div class="basic-report-info">
+            <div class="info-grid">
+              <div class="info-card">
+                <label>Report Type:</label>
+                <span>{{selectedReport.category}}</span>
+              </div>
+              <div class="info-card">
+                <label>Department:</label>
+                <span>{{selectedReport.team || 'All Departments'}}</span>
+              </div>
+              <div class="info-card">
+                <label>Period:</label>
+                <span>{{selectedReport.dateRange.start | date:'mediumDate'}} - {{selectedReport.dateRange.end | date:'mediumDate'}}</span>
+              </div>
+              <div class="info-card">
+                <label>Status:</label>
+                <span class="status-badge" [style.background-color]="getStatusColor(selectedReport.status)">
+                  {{selectedReport.status}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Actions -->
+    <div class="report-actions">
+      <div class="action-group">
+        <button pButton label="Download PDF" icon="pi pi-file-pdf" 
+                (click)="downloadReport(selectedReport, 'pdf')" 
+                [disabled]="selectedReport.status !== 'generated'"
+                class="p-button-outlined p-button-pdf"
+                pTooltip="Download as HTML file with PDF-like formatting"></button>
+        <button pButton label="Download Excel" icon="pi pi-file-excel" 
+                (click)="downloadReport(selectedReport, 'excel')" 
+                [disabled]="selectedReport.status !== 'generated'"
+                class="p-button-outlined p-button-excel"
+                pTooltip="Download as XLS file with structured data"></button>
+        <button pButton label="Download CSV" icon="pi pi-file" 
+                (click)="downloadReport(selectedReport, 'csv')" 
+                [disabled]="selectedReport.status !== 'generated'"
+                class="p-button-outlined p-button-csv"
+                pTooltip="Download as CSV file for spreadsheet import"></button>
+      </div>
+      <div class="action-group">
+        <button pButton label="Delete Report" icon="pi pi-trash" 
+                (click)="deleteReport(selectedReport); showViewDialog = false" 
+                class="p-button-outlined p-button-danger"
+                pTooltip="Permanently delete this report from local storage"></button>
+        <button pButton label="Close" icon="pi pi-times" 
+                (click)="showViewDialog = false" 
+                class="p-button-text"></button>
+      </div>
+    </div>
+
+    <!-- Storage Information -->
+    <div class="storage-info-footer">
+      <i class="pi pi-info-circle"></i>
+      <small>This report is stored locally in your browser. All data and analytics are preserved across sessions.</small>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>

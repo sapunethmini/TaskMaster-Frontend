@@ -1,0 +1,57 @@
+.dashboard-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stat-card h2 {
+  color: #666;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.stat-card .count {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.total .count { color: #2196F3; }
+.todo .count { color: #FFC107; }
+.in-progress .count { color: #9C27B0; }
+.done .count { color: #4CAF50; }
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  border-radius: 4px;
+  margin: 20px 0;
+  text-align: center;
+} 
