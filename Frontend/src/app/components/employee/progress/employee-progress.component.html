@@ -1,0 +1,92 @@
+<div class="progress-container">
+  <div class="progress-header">
+    <h1>My Progress</h1>
+    <p class="subtitle">Track your performance and achievements</p>
+  </div>
+
+  <div class="progress-grid">
+    <!-- Overall Progress Card -->
+    <p-card class="progress-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>Overall Progress</h2>
+        </div>
+      </ng-template>
+      <div class="progress-content">
+        <div class="progress-item">
+          <div class="progress-label">
+            <span>Overall</span>
+            <span class="progress-value">{{ overallProgress }}%</span>
+          </div>
+          <p-progressBar [value]="overallProgress" [showValue]="false"></p-progressBar>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label">
+            <span>Monthly</span>
+            <span class="progress-value">{{ monthlyProgress }}%</span>
+          </div>
+          <p-progressBar [value]="monthlyProgress" [showValue]="false"></p-progressBar>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label">
+            <span>Weekly</span>
+            <span class="progress-value">{{ weeklyProgress }}%</span>
+          </div>
+          <p-progressBar [value]="weeklyProgress" [showValue]="false"></p-progressBar>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Performance Metrics -->
+    <p-card class="metrics-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>Performance Metrics</h2>
+        </div>
+      </ng-template>
+      <div class="metrics-grid">
+        <div *ngFor="let metric of performanceMetrics" class="metric-item">
+          <div class="metric-label">{{ metric.label }}</div>
+          <div class="metric-value" [style.color]="metric.color">{{ metric.value }}%</div>
+          <p-progressBar [value]="metric.value" 
+                        [style]="{'height': '8px'}"
+                        [styleClass]="'custom-progress'">
+          </p-progressBar>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Progress Chart -->
+    <p-card class="chart-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>Monthly Progress</h2>
+        </div>
+      </ng-template>
+      <div class="chart-container">
+        <p-chart type="bar" [data]="chartData" [options]="chartOptions"></p-chart>
+      </div>
+    </p-card>
+
+    <!-- Recent Achievements -->
+    <p-card class="achievements-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>Recent Achievements</h2>
+        </div>
+      </ng-template>
+      <div class="achievements-list">
+        <div *ngFor="let achievement of recentAchievements" class="achievement-item">
+          <div class="achievement-icon">
+            <i class="pi pi-trophy"></i>
+          </div>
+          <div class="achievement-content">
+            <h3>{{ achievement.title }}</h3>
+            <p>{{ achievement.description }}</p>
+            <span class="achievement-date">{{ achievement.date | date }}</span>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div> 

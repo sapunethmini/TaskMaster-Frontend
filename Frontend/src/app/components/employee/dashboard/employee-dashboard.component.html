@@ -1,0 +1,240 @@
+<div class="dashboard-container">
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-container">
+    <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+    <p>Loading your dashboard...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <div class="error-message">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+      <button pButton type="button" icon="pi pi-refresh" 
+              label="Retry" class="p-button-sm" 
+              (click)="retryLoadingTasks()"></button>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!isLoading && !error">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="welcome-section">
+        <h1 class="welcome-title">Welcome back, {{ userProfile.name }}!</h1>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Enhanced Notification Button -->
+        <div class="notification-wrapper">
+          <!-- Overlay to close panel when clicking outside -->
+          <div class="notification-overlay" *ngIf="showNotificationPanel" (click)="hideNotifications()"></div>
+          
+          <button 
+            class="notification-btn" 
+            (click)="showNotifications()"
+            type="button"
+            pTooltip="Notifications"
+            tooltipPosition="bottom">
+            <i class="pi pi-bell"></i>
+            <span 
+              class="notification-badge" 
+              *ngIf="userProfile.notifications > 0">
+              {{ userProfile.notifications > 99 ? '99+' : userProfile.notifications }}
+            </span>
+          </button>
+
+          <!-- Notification Panel -->
+          <div class="notification-panel" *ngIf="showNotificationPanel">
+            <!-- Panel Header -->
+            <div class="notification-panel-header">
+              <h4>Notifications</h4>
+              <div class="notification-panel-actions">
+                <button 
+                  pButton 
+                  type="button" 
+                  icon="pi pi-refresh" 
+                  class="p-button-sm p-button-text" 
+                  (click)="loadUserNotifications()"
+                  [loading]="isLoadingNotifications"
+                  pTooltip="Refresh notifications">
+                </button>
+                <button 
+                  pButton 
+                  type="button" 
+                  icon="pi pi-check-circle" 
+                  class="p-button-sm p-button-text" 
+                  (click)="markAllNotificationsAsRead()"
+                  *ngIf="userProfile.notifications > 0"
+                  pTooltip="Mark all as read">
+                </button>
+                <button 
+                  pButton 
+                  type="button" 
+                  icon="pi pi-times" 
+                  class="p-button-sm p-button-text" 
+                  (click)="hideNotifications()"
+                  pTooltip="Close">
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel Content -->
+            <div class="notification-panel-content">
+              <!-- Loading State -->
+              <div *ngIf="isLoadingNotifications" class="notification-loading">
+                <p-progressBar mode="indeterminate" [style]="{'height': '4px', 'margin-bottom': '1rem'}"></p-progressBar>
+                <p>Loading notifications...</p>
+              </div>
+
+              <!-- No Notifications -->
+              <div *ngIf="!isLoadingNotifications && notifications.length === 0" class="no-notifications">
+                <i class="pi pi-bell-slash"></i>
+                <h5>No notifications</h5>
+                <p>You're all caught up!</p>
+              </div>
+
+              <!-- Notification List -->
+              <div *ngIf="!isLoadingNotifications && notifications.length > 0" class="notification-list">
+                <div 
+                  *ngFor="let notification of notifications; trackBy: trackNotificationBy" 
+                  class="notification-item" 
+                  [class.unread]="!notification.read"
+                  (click)="markNotificationAsRead(notification)">
+                  
+                  <div class="notification-icon" [style.color]="getNotificationColor(notification.type)">
+                    <i class="pi" [ngClass]="getNotificationIcon(notification.type)"></i>
+                  </div>
+                  
+                  <div class="notification-content">
+                    <div class="notification-header-info">
+                      <span class="notification-title">{{ notification.title }}</span>
+                      <span class="notification-time">{{ formatNotificationTime(notification.createdAt) }}</span>
+                    </div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    
+                    <!-- Task-related notification indicator -->
+                    <div *ngIf="notification.taskId" class="notification-tag">
+                      <i class="pi pi-bookmark"></i>
+                      <span>Task Related</span>
+                    </div>
+                  </div>
+
+                  <div class="notification-status" *ngIf="!notification.read">
+                    <span class="unread-dot"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Show More (if there are many notifications) -->
+              <div *ngIf="notifications.length > 5" class="notification-footer">
+                <button 
+                  pButton 
+                  type="button" 
+                  label="View All Notifications" 
+                  class="p-button-sm p-button-text" 
+                  (click)="navigateToProfile()">
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="profile-section" (click)="navigateToProfile()">
+          <p-avatar 
+            [label]="userProfile.avatar" 
+            styleClass="profile-avatar"
+            shape="circle">
+          </p-avatar>
+          <div class="profile-info">
+            <span class="profile-name">{{ userProfile.name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="charts-grid">
+        <!-- Performance Overview Chart -->
+        <div class="chart-card performance-card">
+          <div class="card-header">
+            <h3 class="card-title">Performance</h3>
+            <div class="task-counts-display">
+              <div class="count-item completed-count">
+                <span class="count-number">{{ completedTasks }}</span>
+                <span class="count-label">Complete</span>
+              </div>
+              <div class="count-item progress-count">
+                <span class="count-number">{{ inProgressTasksCount }}</span>
+                <span class="count-label">Progress</span>
+              </div>
+              <div class="count-item pending-count">
+                <span class="count-number">{{ pendingTasks }}</span>
+                <span class="count-label">Pending</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-container pie-chart-container">
+            <p-chart 
+              type="pie" 
+              [data]="performanceChartData" 
+              >
+            </p-chart>
+          </div>
+        </div>
+
+        <!-- Feedback Chart -->
+        <div class="chart-card performance-card">
+          <div class="card-header">
+            <h3 class="card-title">Feedback</h3>
+              <div class="rating-summary">
+              <div class="star-rating">
+                <i *ngFor="let star of [1,2,3,4,5]" 
+                   class="pi" 
+                   [ngClass]="star <= starRating ? 'pi-star-fill' : 'pi-star'">
+                </i>
+                <span class="rating-value">{{ starRating.toFixed(1) }}</span>
+              </div>
+              <div class="completion-rate">
+                <span class="rate-number">{{ getCompletionPercentage() }}%</span>
+                <span class="rate-label">Completion Rate</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-container pie-chart-container">
+             <div class="motivation-section">
+            <p class="motivation-text">{{ getMotivationalMessage() }}</p>
+            <div class="progress-indicator">
+              <p-progressBar 
+                [value]="getCompletionPercentage()" 
+                [showValue]="false"
+                [style]="{'height': '18px'}">
+              </p-progressBar>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tasks Section -->
+    <app-employee-tasks 
+      [visibleColumns]="{
+        title: true,
+        description: true,
+        priority: true,
+        status: false,
+        category: false,
+        dueDate: false,
+        actions: false
+      }"
+      [compact]="true"
+      [maxRows]="5"
+      [showCreateButton]="false">
+    </app-employee-tasks>
+  </div>
+</div>
+

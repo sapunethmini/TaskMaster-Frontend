@@ -1,0 +1,73 @@
+<!-- user-login.component.html -->
+<div class="login-page">
+  <!-- animated star canvas -->
+  <canvas id="stars"></canvas>
+  
+  <!-- static brick wall overlay -->
+  <div class="brick-wall"></div>
+  
+  <!-- blue lamp glow -->
+  <div class="lamp-glow"></div>
+  
+  <!-- snow canvas -->
+  <canvas id="snow"></canvas>
+  
+  <!-- glassmorphic login card -->
+  <div class="login-container">
+    <h2>Login</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <div class="input-box">
+          <input 
+            type="text" 
+            id="username" 
+            class="form-input" 
+            placeholder="Username"
+            formControlName="username"
+            autocomplete="off">
+          <i class="bx bxs-user"></i>
+        </div>
+        <small *ngIf="submitted && f['username'].errors?.['required']" class="error-text">
+          Username is required
+        </small>
+      </div>
+      
+      <div class="form-group">
+        <div class="password-field">
+          <input 
+            type="password" 
+            id="password" 
+            class="form-input" 
+            placeholder="Password"
+            formControlName="password"
+            autocomplete="new-password">
+        </div>
+        <small *ngIf="submitted && f['password'].errors?.['required']" class="error-text">
+          Password is required
+        </small>
+      </div>
+      
+      <div class="remember-forgot">
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe" formControlName="rememberMe">
+          <label for="rememberMe">Remember me</label>
+        </div>
+        <a href="#" class="forgot-password">Forgot password?</a>
+      </div>
+      
+      <button type="submit" class="submit-button" [disabled]="loading">
+        <span *ngIf="loading">Loading...</span>
+        <span *ngIf="!loading">Login</span>
+      </button>
+      
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      
+      <div class="signup-link">
+        <p>Don't have an account? <a href="/signup">Register</a></p>
+      </div>
+    </form>
+  </div>
+</div>

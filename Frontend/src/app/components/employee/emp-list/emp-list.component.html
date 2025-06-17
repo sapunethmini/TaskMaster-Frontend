@@ -1,0 +1,160 @@
+<div class="employee-directory">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <div class="card">
+    <!-- Page Title -->
+    <div class="page-header">
+      <h2>{{pageTitle}}</h2>
+      <button *ngIf="selectedTeam" 
+        pButton 
+        type="button" 
+        icon="pi pi-arrow-left" 
+        label="Back to Teams" 
+        class="p-button-text"
+        (click)="router.navigate(['/admin/user-management'])">
+      </button>
+    </div>
+
+    <!-- Error message display -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+      <button class="refresh-button" pButton type="button" icon="pi pi-refresh" (click)="refreshList()"></button>
+    </div>
+
+    <div class="search-container">
+      <div class="p-inputgroup search-input">
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          pInputText 
+          [placeholder]="searchType === 'id' ? 'Search by Employee ID...' : 'Search by Employee Name...'" 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+        />
+      </div>
+      
+      <div class="search-buttons">
+        <button 
+          pButton 
+          type="button"
+          label="Search by Name" 
+          icon="pi pi-sort-amount-down"
+          class="p-button-outlined search-button" 
+          [class.active-search]="searchType === 'name'"
+          (click)="setSearchType('name')"
+        ></button>
+        <button 
+          pButton 
+          type="button"
+          label="Search by ID" 
+          icon="pi pi-sort-amount-down"
+          class="p-button-outlined search-button" 
+          [class.active-search]="searchType === 'id'"
+          (click)="setSearchType('id')"
+        ></button>
+      </div>
+      <button 
+        pButton 
+        type="button" 
+        label="New Employee" 
+        icon="pi pi-plus" 
+        class="new-emp-button" 
+        (click)="navigateToAddEmployee()"
+      ></button>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading-indicator">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading employees...</span>
+    </div>
+
+    <p-table 
+      [value]="filteredEmployees" 
+      [tableStyle]="{ 'width': '100%' }"
+      [paginator]="true" 
+      [rows]="10" 
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees"
+      [rowsPerPageOptions]="[5, 10, 25, 50]"
+      styleClass="employee-table"
+      [sortField]="'id'"
+      [sortOrder]="1"
+      *ngIf="!isLoading"
+    >
+     <!-- Enhanced table row template -->
+<ng-template pTemplate="body" let-employee>
+  <tr>
+    <!-- ID Column - Made more prominent -->
+    <td class="id-column">
+      <span class="employee-id" [title]="'Employee ID: ' + employee.id">
+        {{employee.id}}
+      </span>
+    </td>
+    <td>
+      <div class="employee-name">
+        <span class="employee-avatar">{{getInitials(employee)}}</span>
+        <span>{{getFullName(employee)}}</span>
+      </div>
+    </td>
+    <td>{{employee.email}}</td>
+    <td>{{getRoleName(employee.role_Id)}}</td>
+    <td>
+      <div class="action-buttons">
+        <!-- Update button with enhanced click handler -->
+        <button 
+          pButton 
+          type="button" 
+          icon="pi pi-user-edit" 
+          class="p-button-rounded p-button-text update-btn" 
+          [title]="'Update Employee: ' + getFullName(employee) + ' (ID: ' + employee.id + ')'"
+          (click)="updateEmployee(employee)"
+          [attr.data-employee-id]="employee.id"
+        ></button>
+        
+        <!-- Delete button -->
+        <button 
+          pButton 
+          type="button" 
+          icon="pi pi-times" 
+          class="p-button-rounded p-button-text delete-btn" 
+          [title]="'Delete Employee: ' + getFullName(employee) + ' (ID: ' + employee.id + ')'"
+          (click)="confirmDelete(employee, $event)"
+          [attr.data-employee-id]="employee.id"
+        ></button>
+      </div>
+    </td>
+  </tr>
+</ng-template>
+      <ng-template pTemplate="body" let-employee>
+        <tr>
+          <td>{{employee.id}}</td>
+          <td>
+            <div class="employee-name">
+              <span class="employee-avatar">{{getInitials(employee)}}</span>
+              <span>{{getFullName(employee)}}</span>
+            </div>
+          </td>
+          <td>{{employee.email}}</td>
+          <!-- <td>{{getTeamName(employee.department_Id)}}</td> -->
+          <td>{{getRoleName(employee.role_Id)}}</td>
+          <td>
+            <div class="action-buttons">
+              <button pButton type="button" icon="pi pi-user-edit" class="p-button-rounded p-button-text" (click)="updateEmployee(employee)"></button>
+              <button pButton type="button" icon="pi pi-times" class="p-button-rounded p-button-text" (click)="confirmDelete(employee, $event)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">No employees found matching your search criteria</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

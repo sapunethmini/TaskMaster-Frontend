@@ -1,0 +1,93 @@
+<div class="tasks-container">
+  <div class="tasks-header">
+    <div class="header-content">
+      <h1>My Tasks</h1>
+      <p class="subtitle">Manage and track your assigned tasks</p>
+    </div>
+    <button pButton 
+            type="button" 
+            label="New Task" 
+            icon="pi pi-plus" 
+            class="p-button-primary"
+            (click)="createNewTask()"
+            *ngIf="showCreateButton">
+    </button>
+  </div>
+
+  <!-- Task Filters -->
+  <div class="task-filters">
+    <div class="filter-section">
+      <h3>Filters</h3>
+      <div class="filter-buttons">
+        <button pButton 
+                type="button" 
+                label="All Priorities" 
+                class="p-button-outlined"
+                (click)="showAllTasks()">
+        </button>
+        <button pButton 
+                type="button" 
+                label="High Priority" 
+                class="p-button-outlined p-button-danger"
+                (click)="filterTasksByPriority('HIGH')">
+        </button>
+        <button pButton 
+                type="button" 
+                label="Medium Priority" 
+                class="p-button-outlined p-button-warning"
+                (click)="filterTasksByPriority('MEDIUM')">
+        </button>
+        <button pButton 
+                type="button" 
+                label="Low Priority" 
+                class="p-button-outlined p-button-success"
+                (click)="filterTasksByPriority('LOW')">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p-card>
+    <p-table [value]="getDisplayTasks()" 
+             [paginator]="!compact" 
+             [rows]="maxRows" 
+             [showCurrentPageReport]="!compact"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tasks"
+             [rowsPerPageOptions]="[10,25,50]"
+             [loading]="loading">
+      <ng-template pTemplate="header">
+        <tr>
+          <th *ngIf="visibleColumns.title">Title</th>
+          <th *ngIf="visibleColumns.description">Description</th>
+          <th *ngIf="visibleColumns.priority">Priority</th>
+          <th *ngIf="visibleColumns.status">Status</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-task>
+        <tr>
+          <td *ngIf="visibleColumns.title">{{ task.title }}</td>
+          <td *ngIf="visibleColumns.description">{{ task.description }}</td>
+          <td *ngIf="visibleColumns.priority">
+            <p-tag [severity]="getPrioritySeverity(task.priority)" [value]="task.priority"></p-tag>
+          </td>
+          <td *ngIf="visibleColumns.status">
+            <p-dropdown [options]="statusOptions" 
+                       [(ngModel)]="task.status"
+                       (onChange)="updateTaskStatus(task, $event.value)"
+                       [style]="{'width':'100%'}"
+                       [showClear]="false"
+                       [disabled]="loading">
+            </p-dropdown>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="getVisibleColumnCount()" class="text-center">
+            No tasks found
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

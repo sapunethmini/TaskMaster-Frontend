@@ -1,0 +1,194 @@
+ * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Layout Container */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            color: #2c2d2e;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .app-title {
+            color: rgb(37, 37, 37);
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar-overview {
+            padding: 15px 20px;
+            color: #04377e;
+            font-size: 14px;
+            font-weight: 800;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+        }
+
+        .sidebar-overview h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Menu Styles */
+        .nav-menu {
+            padding: 10px 0;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-menu li {
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .nav-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgb(3, 35, 122);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-menu li:hover a {
+            color: rgb(3, 35, 122);
+            background-color: #e4eff5;
+            font-weight: bolder;
+        }
+
+        .nav-menu li a.active {
+            color: rgb(3, 35, 122);
+            background-color: #b8e1f8;
+            font-weight: 800;
+        }
+
+        .nav-menu li:has(a.active)::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #5f95f2;
+        }
+
+        .nav-menu i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .nav-menu span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+
+        /* For small screens */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar-header {
+                padding: 15px 10px;
+                text-align: center;
+            }
+
+            .app-title {
+                font-size: 16px;
+            }
+
+            .sidebar-overview {
+                display: none;
+            }
+
+            .nav-menu span {
+                display: none;
+            }
+
+            .nav-menu i {
+                margin-right: 0;
+            }
+
+            .nav-menu li a {
+                justify-content: center;
+                padding: 15px 10px;
+            }
+
+            .content-area {
+                margin-left: 60px;
+            }
+        }
+
+        /* Demo content styling */
+        .demo-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-content h1 {
+            color: #2c2d2e;
+            margin-bottom: 1rem;
+        }
+
+        .demo-content p {
+            color: #6b7280;
+            line-height: 1.6;
+        }

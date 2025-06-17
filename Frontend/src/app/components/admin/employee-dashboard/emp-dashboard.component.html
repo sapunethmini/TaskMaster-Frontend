@@ -1,0 +1,143 @@
+<div class="dashboard-container">
+    <div class="dashboard-title">
+        <h1>Dashboard</h1>
+        <div class="dashboard-header">
+            <div class="user-actions">
+                <div class="notification-icon">
+                    <i class="pi pi-bell"></i>
+                    <span class="notification-badge">2</span>
+                </div>
+                <div class="user-avatar">JD</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoadingData" class="loading-container">
+        <i class="pi pi-spinner pi-spin"></i>
+        <span>Loading dashboard data...</span>
+    </div>
+
+    <div class="stat-cards" *ngIf="!isLoadingData">
+        <div class="stat-card">
+            <div class="stat-header">Total Tasks</div>
+            <div class="stat-value">{{totalTasks}}</div>
+            <div class="stat-growth" [ngClass]="totalTasksGrowth > 0 ? 'positive' : 'negative'">
+                <i [ngClass]="totalTasksGrowth > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i> 
+                {{(totalTasksGrowth < 0 ? -totalTasksGrowth : totalTasksGrowth) | number:'1.1-1'}}% from last month
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">Completed</div>
+            <div class="stat-value completed">{{completedTasks}}</div>
+            <div class="stat-growth" [ngClass]="completedTasksGrowth > 0 ? 'positive' : 'negative'">
+                <i [ngClass]="completedTasksGrowth > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i> 
+                {{(completedTasksGrowth < 0 ? -completedTasksGrowth : completedTasksGrowth) | number:'1.1-1'}}% from last month
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">In Progress</div>
+            <div class="stat-value in-progress">{{inProgressTasks}}</div>
+            <div class="stat-growth" [ngClass]="inProgressTasksGrowth > 0 ? 'positive' : 'negative'">
+                <i [ngClass]="inProgressTasksGrowth > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i> 
+                {{(inProgressTasksGrowth < 0 ? -inProgressTasksGrowth : inProgressTasksGrowth) | number:'1.1-1'}}% from last month
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">Pending</div>
+            <div class="stat-value pending">{{pendingTasks}}</div>
+            <div class="stat-growth" [ngClass]="pendingTasksGrowth > 0 ? 'positive' : 'negative'">
+                <i [ngClass]="pendingTasksGrowth > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i> 
+                {{(pendingTasksGrowth < 0 ? -pendingTasksGrowth : pendingTasksGrowth) | number:'1.1-1'}}% from last month
+            </div>
+        </div>
+    </div>
+
+    <div class="charts-section" *ngIf="!isLoadingData">
+        <div class="section-header">
+            <h2>Task Trends & Predictions</h2>
+            <p class="section-description">Historical data and forecasted task completion trends</p>
+        </div>
+        
+        <div class="trends-content">
+            <!-- Chart Column (2/3 width) -->
+            <div class="chart-column">
+                <div class="chart-header">
+                    <h3>Task Completion Trends</h3>
+                    <div class="chart-legend">
+                        <span class="legend-item">
+                            <span class="legend-dot completed"></span>
+                            Historical Data
+                        </span>
+                        <span class="legend-item">
+                            <span class="legend-dot predicted"></span>
+                            Predictions
+                        </span>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <p-chart 
+                        type="line" 
+                        [data]="chartData" 
+                        [options]="chartOptions"
+                        style="width: 100%; height: 100%;">
+                    </p-chart>
+                </div>
+            </div>
+
+            <!-- Analysis Column (1/3 width) -->
+            <div class="analysis-column">
+                <div class="analysis-card">
+                    <div class="analysis-header">
+                        <div class="analysis-icon">
+                            <i class="pi pi-chart-line"></i>
+                        </div>
+                        <h4 class="analysis-title">Trend Analysis</h4>
+                    </div>
+                    <div class="analysis-content">
+                        Based on historical patterns, task completion is trending {{getTrendDirection().toLowerCase()}}
+                    </div>
+                </div>
+                
+                <div class="analysis-card">
+                    <div class="analysis-header">
+                        <div class="analysis-icon">
+                            <i class="pi pi-calendar"></i>
+                        </div>
+                        <h4 class="analysis-title">Next Month Forecast</h4>
+                    </div>
+                    <div class="analysis-content">
+                        Estimated {{(completedTasks * 1.15) | number:'1.0-0'}} tasks to be completed
+                    </div>
+                </div>
+                
+                <div class="analysis-card">
+                    <div class="analysis-header">
+                        <div class="analysis-icon">
+                            <i class="pi pi-exclamation-triangle"></i>
+                        </div>
+                        <h4 class="analysis-title">Workload Alert</h4>
+                    </div>
+                    <div class="analysis-content">
+                        {{pendingTasks > 30 ? 'High' : pendingTasks > 15 ? 'Medium' : 'Low'}} workload expected
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action buttons for refreshing data -->
+    <div class="dashboard-actions" *ngIf="!isLoadingData">
+        <button class="btn-refresh" (click)="refreshDashboardData()">
+            <i class="pi pi-refresh"></i>
+            Refresh Data
+        </button>
+        <button class="btn-export" (click)="exportChartData()">
+            <i class="pi pi-download"></i>
+            Export Data
+        </button>
+    </div>
+</div>

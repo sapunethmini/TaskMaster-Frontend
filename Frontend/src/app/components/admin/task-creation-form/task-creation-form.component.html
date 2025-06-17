@@ -1,0 +1,59 @@
+  <h3 class="form-title">Create Task for {{ employee?.firstname }} {{ employee?.lastname }}</h3>
+
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <div class="form-field_1 half-width">
+        <label>Title</label>
+        <input type="text" pInputText formControlName="title" />
+        <small *ngIf="submitted && f['title'].errors" class="error-message">Min 3 characters</small>
+      </div>
+
+      <div class="form-field half-width">
+        <label>Team</label>
+        <input type="text" pInputText formControlName="team" readonly />
+      </div>
+    </div>
+
+   
+
+    <div class="form-row">
+      <div class="form-field_1 half-width">
+        <label>Status</label>
+        <p-dropdown class="half-width_dropdown" [options]="statusOptions" formControlName="status" placeholder="Select"></p-dropdown>
+      </div>
+
+      <div class="form-field_1 half-width">
+        <label>Priority</label>
+        <p-dropdown class="half-width_dropdown" [options]="priorityOptions" formControlName="priority" placeholder="Select"></p-dropdown>
+      </div>
+    </div>
+     <div class="form-row">
+      <div class="form-field half-width">
+        <label>Due Date</label>
+        <p-calendar formControlName="dueDate" [minDate]="minDate" showIcon></p-calendar>
+      </div>
+
+      <div class="form-field half-width">
+        <label>Duration (hrs)</label>
+        <p-inputNumber 
+          formControlName="duration" 
+          [min]="0.5" 
+          [step]="0.5" 
+          mode="decimal" 
+          [showButtons]="true" 
+          buttonLayout="horizontal">
+        </p-inputNumber>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button pButton type="submit" label="Create" class="p-button-sm p-button-success"></button>
+      <button pButton type="button" label="Reset" class="p-button-sm p-button-secondary" (click)="onReset()"></button>
+    </div>
+  </form>
+
+  <div class="back-link">
+    <a (click)="ref.close()" class="back-button">
+      <i class="pi pi-arrow-left"></i> Back
+    </a>
+  </div>

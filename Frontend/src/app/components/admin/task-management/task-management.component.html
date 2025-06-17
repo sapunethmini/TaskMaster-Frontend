@@ -1,0 +1,28 @@
+<div class="task-management-container">
+  <div class="teams-grid">
+    <div *ngFor="let team of teams" class="team-card" (click)="viewTeamTasks(team)">
+      <div class="team-content">
+        <div class="task-stats" [style.background-color]="team.color">
+          <div class="total-tasks">{{team.totalTasks}}</div>
+          <div class="task-label">Total Tasks</div>
+        </div>
+        <div class="team-info">
+          <h3>{{team.name}}</h3>
+          <div class="task-details">
+            <div class="task-stat">
+              <span class="completed">{{team.completedTasks}}</span>
+              <span class="label">Completed</span>
+            </div>
+            <div class="task-stat">
+              <span class="pending">{{team.pendingTasks}}</span>
+              <span class="label">Pending</span>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="getCompletionPercentage(team)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,18 @@
+<div class="user-management-container">
+  <div class="header">
+-  </div>
+
+  <div class="teams-grid">
+    <div *ngFor="let team of teams" class="team-card" (click)="viewTeamMembers(team)">
+      <div class="team-content">
+        <div class="member-count" [style.background-color]="team.color">
+          {{team.memberCount}}
+        </div>
+        <div class="team-info">
+          <h3>{{team.name}}</h3>
+          <p>{{team.memberCount}} Members</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

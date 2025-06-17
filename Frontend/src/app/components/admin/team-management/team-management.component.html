@@ -1,0 +1,70 @@
+<div class="container">
+    
+    <div class="team-grid">
+      <div *ngFor="let team of teams" class="team-card" (click)="viewTeamMembers(team)">
+        <p-card>
+          <ng-template pTemplate="header">
+            <div class="card-header" [ngStyle]="{
+              'background-color': getLightColor(team.color),
+              'border-bottom': '1px solid ' + team.color
+            }">
+              <h2 [ngStyle]="{'color': team.color}">{{team.name}}</h2>
+            </div>
+          </ng-template>
+          
+          <div class="card-content">
+            <div class="progress-wrapper">
+              <div class="progress-container">
+                <div class="progress-background"></div>
+                <div class="progress-value" [ngStyle]="{
+                  'width': team.progress + '%',
+                  'background-color': team.color
+                }"></div>
+              </div>
+            </div>
+            
+            <div class="percentage">
+              <span>{{team.progress}}%</span>
+            </div>
+            
+            <div class="metrics">
+              <div class="metric-item">
+                <span class="metric-label">Total Tasks:</span>
+                <span class="metric-value">{{team.totalTasks}}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Completed:</span>
+                <span class="metric-value completed">{{team.tasksCompleted}}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">In Progress:</span>
+                <span class="metric-value in-progress">{{team.totalTasks - team.tasksCompleted}}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Team Members:</span>
+                <span class="metric-value">{{team.members}}</span>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+    
+    <!-- <div class="legend">
+      <div class="legend-label">Legend:</div>
+      <div class="legend-items">
+        <div class="legend-item">
+          <div class="color-box" style="background-color: #4CAF50;"></div>
+          <span>80-100%</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background-color: #FFC107;"></div>
+          <span>60-79%</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background-color: #FF5722;"></div>
+          <span>0-59%</span>
+        </div>
+      </div>
+    </div> -->
+</div>
